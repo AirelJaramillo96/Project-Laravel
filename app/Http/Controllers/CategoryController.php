@@ -27,6 +27,11 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
+        $category = new Cateogory();
+        $category->nombre = $request->name;
+        $category->description = $request->description;
+        $category->condition = '1';
+        $category->save();
         //
     }
 
@@ -41,14 +46,27 @@ class CategoryController extends Controller
      */
     public function update(Request $request)
     {
+        $category = Cateogory::findOrFail($request->id);
+        $category->nombre = $request->name;
+        $category->description = $request->description;
+        $category->condition = '1';
+        $category->save();
+        
         //
     }
     public function deactivate(Request $request)
     {
+        $category = Cateogory::findOrFail($request->id);
+        $category->condition = '0';
+        $category->save();
+        
         //
     }
     public function activate(Request $request)
     {
+        $category = Cateogory::findOrFail($request->id);
+        $category->condition = '1';
+        $category->save();
         //
     }
 
