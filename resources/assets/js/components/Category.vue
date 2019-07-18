@@ -182,9 +182,8 @@
             },
             registerCategory(){
                 let me = this;
-
                 axios.post('/category/register',{
-                    'nname': this.name,
+                    'name': this.name,
                     'description': this.description
                 }).then(function (response) {
                     me.closeModal();
