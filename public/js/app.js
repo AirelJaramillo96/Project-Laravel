@@ -50465,12 +50465,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     data: function data() {
         return {
+            category_id: 0,
             name: '',
             description: '',
             arrayCategory: [],
@@ -50510,12 +50509,29 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 console.log(error);
             });
         },
+        updateCategory: function updateCategory() {
+            if (this.valideCategory()) {
+                return;
+            }
+            var me = this;
+
+            axios.put('/category/update', {
+                'name': this.name,
+                'description': this.description,
+                'id': this.category_id
+            }).then(function (response) {
+                me.closeModal();
+                me.listCategory();
+            }).catch(function (error) {
+                console.log(error);
+            });
+        },
         valideCategory: function valideCategory() {
             this.errorCategory = 0;
             this.errorShowMsjCategory = [];
 
-            if (!this.name) this.errorShowMsjCategory.push("El nombre de la categoria no puede estar vacio");
-            if (this.errorShowMsjCategory.lenght) this.errorCategory = 1;
+            if (!this.name) this.errorShowMsjCategory.push("El nombre de la categoría no puede estar vacío.");
+            if (this.errorShowMsjCategory.length) this.errorCategory = 1;
 
             return this.errorCategory;
         },
@@ -50542,7 +50558,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                                     break;
                                 }
                             case 'update':
-                                {}
+                                {
+                                    this.modal = 1;
+                                    this.tittlemodal = 'Update Category';
+                                    this.typeAction = 2;
+                                    this.name = data['name'];
+                                    this.description = data['description'];
+                                    this.category_id = data['id'];
+                                    break;
+                                    // console.log(data);
+                                }
                         }
                     }
             }
@@ -50802,7 +50827,7 @@ var render = function() {
                             expression: "errorCategory"
                           }
                         ],
-                        staticClass: "form-group row div-error"
+                        staticClass: "form-group row"
                       },
                       [
                         _c(
@@ -50858,7 +50883,12 @@ var render = function() {
                       "button",
                       {
                         staticClass: "btn btn-primary",
-                        attrs: { type: "button" }
+                        attrs: { type: "button" },
+                        on: {
+                          click: function($event) {
+                            return _vm.updateCategory()
+                          }
+                        }
                       },
                       [_vm._v("Actualizar")]
                     )

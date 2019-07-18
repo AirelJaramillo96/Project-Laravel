@@ -114,20 +114,18 @@
                                         <input type="email" v-model="description" class="form-control" placeholder="Ingrese Descripcion">
                                     </div>
                                 </div>
-                                    <div v-show="errorCategory" class="form-group row div-error">
-                                        <div class="text-center text-error">
-                                           <div v-for="error in errorShowMsjCategory" :key="error" v-text="error">
-                                            
-                                           </div> 
-                                        </div>
-                                    </div>  
-
+                                <div v-show="errorCategory" class="form-group row">
+                                    <div class="text-center text-error">
+                                        <div v-for="error in errorShowMsjCategory" :key="error" v-text="error"></div>
+                                    </div>
+                                </div>
+                                    
                             </form>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" @click="closeModal()">Cerrar</button>
                             <button type="button" v-if="typeAction==1" class="btn btn-primary" @click="registerCategory()">Guardar</button>
-                            <button type="button" v-if="typeAction==2" class="btn btn-primary">Actualizar</button>
+                            <button type="button" v-if="typeAction==2" class="btn btn-primary" @click="updateCategory()">Actualizar</button>
                         </div>
                     </div>
                     <!-- /.modal-content -->
@@ -167,6 +165,7 @@
     export default {
         data (){
            return {
+               category_id : 0,
                name :'',
                description : '',
                arrayCategory : [],
@@ -206,13 +205,30 @@
                     console.log(error);
                 });
             },
+            updateCategory(){
+                if (this.valideCategory()){
+                    return;
+                }
+                let me = this;
+
+                axios.put('/category/update',{
+                    'name': this.name,
+                    'description': this.description,
+                    'id': this.category_id
+                }).then(function (response) {
+                    me.closeModal();
+                    me.listCategory();
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            },
             valideCategory(){
-                this.errorCategory =0;
+                this.errorCategory=0;
                 this.errorShowMsjCategory =[];
 
-                if (!this.name) this.errorShowMsjCategory.push("El nombre de la categoria no puede estar vacio");
-                if (this.errorShowMsjCategory.lenght) this.errorCategory = 1;
-                
+                if (!this.name) this.errorShowMsjCategory.push("El nombre de la categoría no puede estar vacío.");
+                if (this.errorShowMsjCategory.length) this.errorCategory = 1;
+
                 return this.errorCategory;
             },
             closeModal(){
@@ -236,7 +252,14 @@
                                   break;
                               }
                               case 'update':{
-
+                                  this.modal =1;
+                                  this.tittlemodal = 'Update Category';
+                                  this.typeAction = 2;
+                                  this.name = data['name'];
+                                  this.description = data['description'];
+                                  this.category_id = data['id'];
+                                  break;
+                                 // console.log(data);
                               }
                           }
                       }
