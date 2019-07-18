@@ -7,7 +7,8 @@
         </template>
 
         <template v-if="menu==1">
-        <category-component></category-component>
+          
+          <category-component></category-component>
            
         </template>
 
