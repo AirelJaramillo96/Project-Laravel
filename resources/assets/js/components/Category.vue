@@ -21,8 +21,8 @@
                             <div class="col-md-6">
                                 <div class="input-group">
                                     <select class="form-control col-md-3" id="opcion" name="opcion">
-                                      <option value="nombre">Nombre</option>
-                                      <option value="descripcion">Descripción</option>
+                                      <option value="name">Nombre</option>
+                                      <option value="description">Descripción</option>
                                     </select>
                                     <input type="text" id="texto" name="texto" class="form-control" placeholder="Texto a buscar">
                                     <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
@@ -105,7 +105,7 @@
                                     <label class="col-md-3 form-control-label" for="text-input">Nombre</label>
                                     <div class="col-md-9">
                                         <input type="text" v-model="name" class="form-control" placeholder="Nombre de categoría">
-                                        <span class="help-block">(*) Ingrese el nombre de la categoría</span>
+                                        <!--<span class="help-block">(*) Ingrese el nombre de la categoría</span>-->
                                     </div>
                                 </div>
                                 <div class="form-group row">
@@ -114,6 +114,14 @@
                                         <input type="email" v-model="description" class="form-control" placeholder="Ingrese Descripcion">
                                     </div>
                                 </div>
+                                    <div v-show="errorCategory" class="form-group row div-error">
+                                        <div class="text-center text-error">
+                                           <div v-for="error in errorShowMsjCategory" :key="error" v-text="error">
+                                            
+                                           </div> 
+                                        </div>
+                                    </div>  
+
                             </form>
                         </div>
                         <div class="modal-footer">
@@ -164,7 +172,9 @@
                arrayCategory : [],
                modal: 0,
                tittlemodal : '',
-               typeAction : 0
+               typeAction : 0,
+               errorCategory : 0,
+               errorShowMsjCategory : []
            } 
         },
         methods : {
@@ -181,7 +191,11 @@
                 });
             },
             registerCategory(){
+                if (this.valideCategory()){
+                    return;
+                }
                 let me = this;
+
                 axios.post('/category/register',{
                     'name': this.name,
                     'description': this.description
@@ -191,6 +205,15 @@
                 }).catch(function (error) {
                     console.log(error);
                 });
+            },
+            valideCategory(){
+                this.errorCategory =0;
+                this.errorShowMsjCategory =[];
+
+                if (!this.name) this.errorShowMsjCategory.push("El nombre de la categoria no puede estar vacio");
+                if (this.errorShowMsjCategory.lenght) this.errorCategory = 1;
+                
+                return this.errorCategory;
             },
             closeModal(){
                 this.modal =0;
@@ -240,4 +263,14 @@
       background-color: #3c29297a !important;
 
     }
+    .div-error{
+        display: flex;
+        justify-content: center;
+    }
+    .text-error{
+        color: red !important;
+        font-weight: bold;
+    }
 </style>
+
+
