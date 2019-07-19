@@ -51510,9 +51510,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     data: function data() {
@@ -51609,18 +51606,22 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             //Envia la petición para vizualizar la data desde esa pagina 
             me.listArticle(page, buscar, criterion);
         },
-        registerCategory: function registerCategory() {
-            if (this.valideCategory()) {
+        registerArticle: function registerArticle() {
+            if (this.valideArticle()) {
                 return;
             }
             var me = this;
 
-            axios.post('/category/register', {
+            axios.post('/article/register', {
+                'idcategory': this.idcategory,
+                'code': this.code,
                 'name': this.name,
+                'stock': this.stock,
+                'price_vent': this.price_vent,
                 'description': this.description
             }).then(function (response) {
                 me.closeModal();
-                me.listCategory(1, '', 'name');
+                me.listArticle(1, '', 'name');
             }).catch(function (error) {
                 console.log(error);
             });
@@ -51706,20 +51707,30 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 result.dismiss === swal.DismissReason.cancel) {}
             });
         },
-        valideCategory: function valideCategory() {
-            this.errorCategory = 0;
-            this.errorShowMsjCategory = [];
+        valideArticle: function valideArticle() {
+            this.errorArticle = 0;
+            this.errorShowMsjArticle = [];
 
-            if (!this.name) this.errorShowMsjCategory.push("El nombre de la categoría no puede estar vacío.");
-            if (this.errorShowMsjCategory.length) this.errorCategory = 1;
+            if (this.idcategory == 0) this.errorShowMsjArticle.push("Seleccione una categoría.");
+            if (!this.name) this.errorShowMsjArticle.push("El nombre del artículo no puede estar vacío.");
+            if (!this.stock) this.errorShowMsjArticle.push("El stock del artículo debe ser un número y no puede estar vacío.");
+            if (!this.price_vent) this.errorShowMsjArticle.push("El precio venta del artículo debe ser un número y no puede estar vacío.");
 
-            return this.errorCategory;
+            if (this.errorShowMsjArticle.length) this.errorArticle = 1;
+
+            return this.errorArticle;
         },
         closeModal: function closeModal() {
             this.modal = 0;
             this.tittlemodal = '';
+            this.idcategory = 0;
+            this.name_category = '';
+            this.code = '';
             this.name = '';
-            this.description = "";
+            this.price_vent = 0;
+            this.stock = 0;
+            this.description = '';
+            this.errorArticle = 0;
         },
         openModal: function openModal(model, action) {
             var data = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
@@ -51732,7 +51743,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                                 {
                                     this.modal = 1;
                                     this.tittlemodal = 'Registrar Articulo';
+                                    this.idcategory = 0;
+                                    this.name_category = '';
+                                    this.code = '';
                                     this.name = '';
+                                    this.price_vent = 0;
+                                    this.stock = 0;
                                     this.description = '';
                                     this.typeAction = 1;
                                     break;
@@ -51742,9 +51758,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                                     this.modal = 1;
                                     this.tittlemodal = 'Actualizar Articulo';
                                     this.typeAction = 2;
+                                    this.article_id = data['id'];
+                                    this.idcategory = data['idcategory'];
+                                    this.code = data['code'];
                                     this.name = data['name'];
+                                    this.stock = data['stock'];
+                                    this.price_vent = data['price_vent'];
                                     this.description = data['description'];
-                                    this.category_id = data['id'];
                                     break;
                                     // console.log(data);
                                 }
@@ -52286,7 +52306,7 @@ var render = function() {
                           staticClass: "col-md-3 form-control-label",
                           attrs: { for: "text-input" }
                         },
-                        [_vm._v("Precio de venta")]
+                        [_vm._v("Precio Venta")]
                       ),
                       _vm._v(" "),
                       _c("div", { staticClass: "col-md-9" }, [
@@ -52300,7 +52320,7 @@ var render = function() {
                             }
                           ],
                           staticClass: "form-control",
-                          attrs: { type: "number", placeholder: " " },
+                          attrs: { type: "number", placeholder: "" },
                           domProps: { value: _vm.price_vent },
                           on: {
                             input: function($event) {
@@ -52335,7 +52355,7 @@ var render = function() {
                             }
                           ],
                           staticClass: "form-control",
-                          attrs: { type: "number", placeholder: " " },
+                          attrs: { type: "number", placeholder: "" },
                           domProps: { value: _vm.stock },
                           on: {
                             input: function($event) {
@@ -52441,7 +52461,7 @@ var render = function() {
                         attrs: { type: "button" },
                         on: {
                           click: function($event) {
-                            return _vm.registerCategory()
+                            return _vm.registerArticle()
                           }
                         }
                       },
@@ -52457,7 +52477,7 @@ var render = function() {
                         attrs: { type: "button" },
                         on: {
                           click: function($event) {
-                            return _vm.updateCategory()
+                            return _vm.updateArticle()
                           }
                         }
                       },
