@@ -109,21 +109,56 @@
                         <div class="modal-body">
                             <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
                                 <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="text-input">Nombre</label>
+                                    <label class="col-md-3 form-control-label" for="text-input">Categoria</label>
                                     <div class="col-md-9">
-                                        <input type="text" v-model="name" class="form-control" placeholder="Nombre de categoría">
+                                        
+                                        <select class="form-control" v-model="idcategory">
+                                            <option value="0" disabled>Seleccione</option>
+                                            <option v-for="category in arrayCategory" :key="category.id" :value="category.id" v-text="category.name"></option>
+                                        </select>
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-md-3 form-control-label" for="text-input">Código</label>
+                                    <div class="col-md-9">
+                                        <input type="text" v-model="code" class="form-control" placeholder="Código de Barras">
                                         <!--<span class="help-block">(*) Ingrese el nombre de la categoría</span>-->
                                     </div>
                                 </div>
+
+                                <div class="form-group row">
+                                    <label class="col-md-3 form-control-label" for="text-input">Nombre</label>
+                                    <div class="col-md-9">
+                                        <input type="text" v-model="name" class="form-control" placeholder="Nombre de artículo">
+                                        <!--<span class="help-block">(*) Ingrese el nombre de la categoría</span>-->
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-md-3 form-control-label" for="text-input">Precio de venta</label>
+                                    <div class="col-md-9">
+                                        <input type="number" v-model="price_vent" class="form-control" placeholder=" ">
+                                        
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-md-3 form-control-label" for="text-input">Stock</label>
+                                    <div class="col-md-9">
+                                        <input type="number" v-model="stock" class="form-control" placeholder=" ">
+                                        
+                                    </div>
+                                </div>
+                                
                                 <div class="form-group row">
                                     <label class="col-md-3 form-control-label" for="email-input">Descripción</label>
                                     <div class="col-md-9">
                                         <input type="email" v-model="description" class="form-control" placeholder="Ingrese Descripcion">
                                     </div>
                                 </div>
-                                <div v-show="errorCategory" class="form-group row">
+                                <div v-show="errorArticle" class="form-group row">
                                     <div class="text-center text-error">
-                                        <div v-for="error in errorShowMsjCategory" :key="error" v-text="error"></div>
+                                        <div v-for="error in errorShowMsjArticle" :key="error" v-text="error"></div>
                                     </div>
                                 </div>
                                     
@@ -174,7 +209,8 @@
                },
                offset : 3,
                criterion : 'name',
-               buscar : ''
+               buscar : '',
+               arrayCategory : []
            } 
         },
         computed:{
@@ -212,6 +248,21 @@
                     var respuesta= response.data;
                     me.arrayArticle = respuesta.articles.data;
                     me.pagination= respuesta.pagination;
+                // handle success
+                console.log(response);
+                })
+                .catch(function (error) {
+                // handle error
+                 console.log(error);
+                });
+            },
+            selectCategory(){
+                let me=this;
+                var url = '/category/selectCategory?page';
+                axios.get(url).then(function (response) {
+                   // console.log(response);
+                    var respuesta= response.data;
+                    me.arrayCategory = respuesta.categories;
                 // handle success
                 console.log(response);
                 })
@@ -352,12 +403,12 @@
             },
             openModal(model, action, data = []){
               switch(model){
-                  case "category":
+                  case "article":
                       {
                           switch(action){
                               case 'register':{
                                   this.modal = 1;
-                                  this.tittlemodal = 'Register Category';
+                                  this.tittlemodal = 'Registrar Articulo';
                                   this.name = '';
                                   this.description = '';
                                   this.typeAction = 1;
@@ -365,7 +416,7 @@
                               }
                               case 'update':{
                                   this.modal =1;
-                                  this.tittlemodal = 'Update Category';
+                                  this.tittlemodal = 'Actualizar Articulo';
                                   this.typeAction = 2;
                                   this.name = data['name'];
                                   this.description = data['description'];
@@ -376,6 +427,7 @@
                           }
                       }
               }
+              this.selectCategory();
             }
         },
         mounted() {

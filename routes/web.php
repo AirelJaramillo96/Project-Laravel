@@ -20,6 +20,9 @@ Route::post('/category/register','CategoryController@store');
 Route::put('/category/update','CategoryController@update');
 Route::put('/category/deactivate','CategoryController@deactivate');
 Route::put('/category/activate','CategoryController@activate');
+Route::get('/category/selectCategory','CategoryController@selectCategory');
+
+
 
 Route::get('/article','ArticleController@index');
 Route::post('/article/register','ArticleController@store');
