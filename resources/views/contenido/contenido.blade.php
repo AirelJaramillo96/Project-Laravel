@@ -30,7 +30,7 @@
         </template>
 
         <template v-if="menu==6">
-            <h1>Contenido del menú 6</h1>
+            <client-component></client-component>
         </template>
 
         <template v-if="menu==7">

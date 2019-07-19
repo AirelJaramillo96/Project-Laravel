@@ -5049,6 +5049,7 @@ window.Vue = __webpack_require__(53);
 Vue.component('example-component', __webpack_require__(57));
 Vue.component('category-component', __webpack_require__(60));
 Vue.component('article-component', __webpack_require__(66));
+Vue.component('client-component', __webpack_require__(66));
 
 var app = new Vue({
   el: '#app',
