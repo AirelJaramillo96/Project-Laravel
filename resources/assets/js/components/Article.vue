@@ -9,8 +9,8 @@
                 <!-- Ejemplo de tabla Listado -->
                 <div class="card">
                     <div class="card-header">
-                        <i class="fa fa-align-justify"></i> Categorías
-                        <button type="button" @click="openModal('category','register')" class="btn btn-secondary" >
+                        <i class="fa fa-align-justify"></i> Articulos
+                        <button type="button" @click="openModal('article','register')" class="btn btn-secondary" >
                             <i class="icon-plus"></i>&nbsp;Nuevo
                         </button>
                     </div>
@@ -22,8 +22,8 @@
                                       <option value="name">Nombre</option>
                                       <option value="description">Descripción</option>
                                     </select>
-                                     <input type="text" v-model="buscar" @keyup.enter="listCategory(1,buscar,criterion)" class="form-control" placeholder="Texto a buscar">
-                                    <button type="submit" @click="listCategory(1,buscar,criterion)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
+                                     <input type="text" v-model="buscar" @keyup.enter="listArticle(1,buscar,criterion)" class="form-control" placeholder="Texto a buscar">
+                                    <button type="submit" @click="listArticle(1,buscar,criterion)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
                                 </div>
                             </div>
                         </div>
@@ -31,24 +31,28 @@
                             <thead>
                                 <tr>
                                     <th>Opciones</th>
+                                    <th>Codigo</th>
                                     <th>Nombre</th>
+                                    <th>Categoria</th>
+                                    <th>Precio Venta</th>
+                                    <th>Stock</th>
                                     <th>Descripción</th>
                                     <th>Estado</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="category in arrayCategory" :key="category.id">
+                                <tr v-for="article in arrayArticle" :key="article.id">
                                     <td>
-                                        <button type="button" @click="openModal('category','update', category)" class="btn btn-warning btn-sm">
+                                        <button type="button" @click="openModal('article','update', article)" class="btn btn-warning btn-sm">
                                           <i class="icon-pencil"></i>
                                         </button> &nbsp;
-                                            <template v-if="category.condition">
-                                                <button type="button" class="btn btn-danger btn-sn" @click="deactivateCategory(category.id)">
+                                            <template v-if="article.condition">
+                                                <button type="button" class="btn btn-danger btn-sn" @click="deactivateCategory(article.id)">
                                                    <i class="icon-trash"></i>
                                                 </button> 
                                             </template>
                                             <template v-else>
-                                                <button type="button" class="btn btn-info btn-sn" @click="activateCategory(category.id)">
+                                                <button type="button" class="btn btn-info btn-sn" @click="activateCategory(article.id)">
                                                    <i class="icon-check"></i>
                                                 </button> 
                                             </template>
@@ -56,10 +60,14 @@
                                           <i class="icon-trash"></i>
                                         </button>-->
                                     </td>
-                                    <td v-text="category.name"></td>
-                                    <td v-text="category.description"></td>
+                                    <td v-text="article.code"></td>
+                                    <td v-text="article.name"></td>
+                                    <td v-text="article.name_category"></td>
+                                    <td v-text="article.price_vent"></td>
+                                    <td v-text="article.stock"></td>
+                                    <td v-text="article.description"></td>
                                     <td>
-                                        <div v-if="category.condition">
+                                        <div v-if="article.condition">
                                             <span class="badge badge-success">Activo</span>
                                         </div>
 
@@ -142,15 +150,20 @@
     export default {
         data (){
            return {
-               category_id : 0,
-               name :'',
+               article_id : 0,
+               idcategory: 0,
+               name_category :'',
+               code : '',
+               name : '',
+               price_vent: 0,
+               stock : 0,
                description : '',
-               arrayCategory : [],
+               arrayArticle : [],
                modal: 0,
                tittlemodal : '',
                typeAction : 0,
-               errorCategory : 0,
-               errorShowMsjCategory : [],
+               errorArticle : 0,
+               errorShowMsjArticle : [],
                pagination : {
                    'total' : 0,
                    'current_page' : 0,
@@ -192,12 +205,12 @@
             }
         },
         methods : {
-            listCategory (page, buscar, criterion){
+            listArticle (page, buscar, criterion){
                 let me=this;
-                var url = '/category?page=' + page + '&buscar='+ buscar + '&criterion='+ criterion;
+                var url = '/article?page=' + page + '&buscar='+ buscar + '&criterion='+ criterion;
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
-                    me.arrayCategory = respuesta.categories.data;
+                    me.arrayArticle = respuesta.articles.data;
                     me.pagination= respuesta.pagination;
                 // handle success
                 console.log(response);
@@ -212,7 +225,7 @@
                 //Actualizar pagina actual
                 me.pagination.current_page = page;
                 //Envia la petición para vizualizar la data desde esa pagina 
-                me.listCategory(page, buscar, criterion);
+                me.listArticle(page, buscar, criterion);
             },
             registerCategory(){
                 if (this.valideCategory()){
@@ -366,7 +379,7 @@
             }
         },
         mounted() {
-            this.listCategory(1, this.buscar, this.criterion);
+            this.listArticle(1, this.buscar, this.criterion);
             //console.log('Component mounted.')
 
         }
