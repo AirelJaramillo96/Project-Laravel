@@ -32,3 +32,7 @@ Route::put('/article/activate','ArticleController@activate');
 Route::get('/client','ClienteController@index');
 Route::post('/client/register','ClienteController@store');
 Route::put('/client/update','ClienteController@update');
+
+Route::get('/supplier','SupplierController@index');
+Route::post('/supplier/register','SupplierController@store');
+Route::put('/supplier/update','SupplierController@update');

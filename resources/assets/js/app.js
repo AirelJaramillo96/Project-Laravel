@@ -19,7 +19,7 @@ window.Vue = require('vue');
  Vue.component('category-component', require('./components/Category.vue'));
  Vue.component('article-component', require('./components/Article.vue'));
  Vue.component('client-component', require('./components/Client.vue'));
-
+ Vue.component('supplier-component', require('./components/Supplier.vue'));
 const app = new Vue({
     el: '#app',
     data :{
