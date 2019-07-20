@@ -38,7 +38,7 @@
         </template>
 
         <template v-if="menu==8">
-            <h1>Contenido del menú 8</h1>
+             <rol-component></rol-componente>
         </template>
 
         <template v-if="menu==9">

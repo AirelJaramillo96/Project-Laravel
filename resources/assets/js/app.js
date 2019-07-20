@@ -20,6 +20,7 @@ window.Vue = require('vue');
  Vue.component('article-component', require('./components/Article.vue'));
  Vue.component('client-component', require('./components/Client.vue'));
  Vue.component('supplier-component', require('./components/Supplier.vue'));
+ Vue.component('rol-component', require('./components/Rol.vue'));
 const app = new Vue({
     el: '#app',
     data :{
