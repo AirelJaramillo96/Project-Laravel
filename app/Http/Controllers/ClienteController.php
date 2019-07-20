@@ -31,7 +31,7 @@ class ClienteController extends Controller
                 'from'          =>  $persons->firstItem(),
                 'to'            =>  $persons->lastItem(),
             ],
-            '$persons' => $persons
+            'persons' => $persons
         ];
     }
     public function store(Request $request)

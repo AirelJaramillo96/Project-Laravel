@@ -46,23 +46,15 @@
                                     <td>
                                         <button type="button" @click="openModal('person','update', person)" class="btn btn-warning btn-sm">
                                           <i class="icon-pencil"></i>
-                                        </button> &nbsp;
+                                        </button> 
                                     </td>
-                                    <td v-text="person.name"></td>
+                                    <td v-text="person.name"></td> 
                                     <td v-text="person.type_document"></td>
                                     <td v-text="person.num_document"></td>
                                     <td v-text="person.address"></td>
                                     <td v-text="person.phone"></td>
                                     <td v-text="person.email"></td>
-                                    <td> 
-                                        <div v-if="category.condition">
-                                            <span class="badge badge-success">Activo</span>
-                                        </div>
-
-                                        <div v-else>
-                                        <span class="badge badge-danger">Desactivado</span>
-                                        </div>
-                                    </td>
+                                   
                                 </tr>
                                 
                             </tbody>
@@ -99,19 +91,52 @@
                                 <div class="form-group row">
                                     <label class="col-md-3 form-control-label" for="text-input">Nombre</label>
                                     <div class="col-md-9">
-                                        <input type="text" v-model="name" class="form-control" placeholder="Nombre de categoría">
-                                        <!--<span class="help-block">(*) Ingrese el nombre de la categoría</span>-->
+                                        <input type="text" v-model="name" class="form-control" placeholder="Nombre de la persona">
+                                
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="email-input">Descripción</label>
+                                    <label class="col-md-3 form-control-label" for="text-input">Tipo de Documento</label>
                                     <div class="col-md-9">
-                                        <input type="email" v-model="description" class="form-control" placeholder="Ingrese Descripcion">
+                                        <select v-model="type_document" class="form-control">
+                                            <option value="DNI">DNI</option>
+                                            <option value="INE">INE</option>
+                                            <option value="PASS">PASS</option>
+                                        </select>
                                     </div>
                                 </div>
-                                <div v-show="errorCategory" class="form-group row">
+                                <div class="form-group row">
+                                    <label class="col-md-3 form-control-label" for="text-input">Numero</label>
+                                    <div class="col-md-9">
+                                        <input type="text" v-model="num_document" class="form-control" placeholder="Numero de Documento">
+                                
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-md-3 form-control-label" for="text-input">Direccion</label>
+                                    <div class="col-md-9">
+                                        <input type="text" v-model="address" class="form-control" placeholder="Direccion">
+                                
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-md-3 form-control-label" for="text-input">Telefono</label>
+                                    <div class="col-md-9">
+                                        <input type="text" v-model="phone" class="form-control" placeholder="Telefono">
+                                
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-md-3 form-control-label" for="text-input">email</label>
+                                    <div class="col-md-9">
+                                        <input type="email" v-model="email" class="form-control" placeholder="Email">
+                                
+                                    </div>
+                                </div>
+
+                                <div v-show="errorPerson" class="form-group row">
                                     <div class="text-center text-error">
-                                        <div v-for="error in errorShowMsjCategory" :key="error" v-text="error"></div>
+                                        <div v-for="error in errorShowMsjPerson" :key="error" v-text="error"></div>
                                     </div>
                                 </div>
                                     
@@ -119,8 +144,8 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" @click="closeModal()">Cerrar</button>
-                            <button type="button" v-if="typeAction==1" class="btn btn-primary" @click="registerCategory()">Guardar</button>
-                            <button type="button" v-if="typeAction==2" class="btn btn-primary" @click="updateCategory()">Actualizar</button>
+                            <button type="button" v-if="typeAction==1" class="btn btn-primary" @click="registerPerson()">Guardar</button>
+                            <button type="button" v-if="typeAction==2" class="btn btn-primary" @click="updatePerson()">Actualizar</button>
                         </div>
                     </div>
                     <!-- /.modal-content -->
@@ -145,12 +170,11 @@
                address : '',
                phone : '',
                email : '',
-
                arrayPerson : [],
                modal: 0,
                tittlemodal : '',
                typeAction : 0,
-               errorPersona : 0,
+               errorPerson : 0,
                errorShowMsjPerson : [],
                pagination : {
                    'total' : 0,
@@ -193,19 +217,16 @@
             }
         },
         methods : {
-            listPerson (page, buscar, criterion){
+             listPerson (page,buscar,criterion){
                 let me=this;
-                var url = '/client?page=' + page + '&buscar='+ buscar + '&criterion='+ criterion;
+                var url= '/client?page=' + page + '&buscar='+ buscar + '&criterion='+ criterion;
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
                     me.arrayPerson = respuesta.persons.data;
                     me.pagination= respuesta.pagination;
-                // handle success
-                console.log(response);
                 })
                 .catch(function (error) {
-                // handle error
-                 console.log(error);
+                    console.log(error);
                 });
             },
             changePage (page, buscar, criterion){
@@ -215,75 +236,96 @@
                 //Envia la petición para vizualizar la data desde esa pagina 
                 me.listPerson(page, buscar, criterion);
             },
-            registerCategory(){
-                if (this.valideCategory()){
+            registerPerson(){
+                if (this.validePerson()){
                     return;
                 }
                 let me = this;
 
-                axios.post('/category/register',{
+                axios.post('/client/register',{
                     'name': this.name,
-                    'description': this.description
+                    'type_document': this.type_document,
+                    'num_document': this.num_document,
+                    'address': this.address,
+                    'phone': this.phone,
+                    'email': this.email
                 }).then(function (response) {
                     me.closeModal();
-                    me.listCategory(1,'','name');
+                    me.listPerson(1,'','name');
                 }).catch(function (error) {
                     console.log(error);
                 });
             },
-            updateCategory(){
-                if (this.valideCategory()){
+            updatePerson(){
+                if (this.validePerson()){
                     return;
                 }
                 let me = this;
 
-                axios.put('/category/update',{
+                axios.put('/client/update',{
                     'name': this.name,
-                    'description': this.description,
-                    'id': this.category_id
+                    'type_document': this.type_document,
+                    'num_document': this.num_document,
+                    'address': this.address,
+                    'phone': this.phone,
+                    'email': this.email,
+                    'id': this.persona_id
                 }).then(function (response) {
                     me.closeModal();
-                    me.listCategory(1,'','name');
+                    me.listPerson(1,'','name');
                 }).catch(function (error) {
                     console.log(error);
                 });
             },
-            valideCategory(){
-                this.errorCategory=0;
-                this.errorShowMsjCategory =[];
+            validePerson(){
+                this.errorPerson=0;
+                this.errorShowMsjPerson =[];
 
-                if (!this.name) this.errorShowMsjCategory.push("El nombre de la categoría no puede estar vacío.");
-                if (this.errorShowMsjCategory.length) this.errorCategory = 1;
+                if (!this.name) this.errorShowMsjPerson.push("El nombre de la persona no puede estar vacío.");
+                if (this.errorShowMsjPerson.length) this.errorPerson = 1;
 
-                return this.errorCategory;
+                return this.errorPerson;
             },
             closeModal(){
                 this.modal =0;
                 this.tittlemodal='';
                 this.name='';
-                this.description="";
+                this.type_document='DNI';
+                this.num_document='';
+                this.address='';
+                this.phone='';
+                this.email='';
+                this.errorPerson=0;
 
             },
             openModal(model, action, data = []){
               switch(model){
-                  case "category":
+                  case "person":
                       {
                           switch(action){
                               case 'register':{
                                   this.modal = 1;
-                                  this.tittlemodal = 'Register Category';
-                                  this.name = '';
-                                  this.description = '';
+                                  this.tittlemodal = 'Registrar Cliente';
+                                  this.name='';
+                                  this.type_document='DNI';
+                                  this.num_document='';
+                                  this.address='';
+                                  this.phone='';
+                                  this.email='';
                                   this.typeAction = 1;
                                   break;
                               }
                               case 'update':{
                                   this.modal =1;
-                                  this.tittlemodal = 'Update Category';
+                                  this.tittlemodal = 'Actualizar Cliente';
                                   this.typeAction = 2;
+                                  this.persona_id = data['id'];
                                   this.name = data['name'];
-                                  this.description = data['description'];
-                                  this.category_id = data['id'];
+                                  this.type_document = data['type_document'];
+                                  this.num_document = data['num_document'];
+                                  this.address = data['address'];
+                                  this.phone = data['phone'];
+                                  this.email = data['email'];
                                   break;
                                  // console.log(data);
                               }
