@@ -13,4 +13,7 @@ class Persona extends Model
         return $this->hasOne('App\Supplier');
     }
     //
+    public function user(){
+        return $this->hasOne('App\User');
+    }
 }

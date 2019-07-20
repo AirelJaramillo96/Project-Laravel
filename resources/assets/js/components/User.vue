@@ -9,8 +9,8 @@
                 <!-- Ejemplo de tabla Listado -->
                 <div class="card">
                     <div class="card-header">
-                        <i class="fa fa-align-justify"></i> Articulos
-                        <button type="button" @click="openModal('article','register')" class="btn btn-secondary" >
+                        <i class="fa fa-align-justify"></i> Usuarios
+                        <button type="button" @click="openModal('person','register')" class="btn btn-secondary" >
                             <i class="icon-plus"></i>&nbsp;Nuevo
                         </button>
                     </div>
@@ -20,10 +20,12 @@
                                 <div class="input-group">
                                     <select class="form-control col-md-3" v-model="criterion">
                                       <option value="name">Nombre</option>
-                                      <option value="description">Descripción</option>
+                                      <option value="num_document">Documento</option>
+                                      <option value="email">Email</option>
+                                      <option value="phone">Telefono</option>
                                     </select>
-                                     <input type="text" v-model="buscar" @keyup.enter="listArticle(1,buscar,criterion)" class="form-control" placeholder="Texto a buscar">
-                                    <button type="submit" @click="listArticle(1,buscar,criterion)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
+                                     <input type="text" v-model="buscar" @keyup.enter="listPerson(1,buscar,criterion)" class="form-control" placeholder="Texto a buscar">
+                                    <button type="submit" @click="listPerson(1,buscar,criterion)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
                                 </div>
                             </div>
                         </div>
@@ -31,50 +33,43 @@
                             <thead>
                                 <tr>
                                     <th>Opciones</th>
-                                    <th>Codigo</th>
                                     <th>Nombre</th>
-                                    <th>Categoria</th>
-                                    <th>Precio Venta</th>
-                                    <th>Stock</th>
-                                    <th>Descripción</th>
-                                    <th>Estado</th>
+                                    <th>Tipo Documento</th>
+                                    <th>Numero</th>
+                                    <th>Direccion</th>
+                                    <th>Telefono</th>
+                                    <th>email</th>
+                                    <th>Usuario</th>
+                                    <th>Rol</th>
+                                    
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="article in arrayArticle" :key="article.id">
+                                <tr v-for="person in arrayPerson" :key="person.id">
                                     <td>
-                                        <button type="button" @click="openModal('article','update', article)" class="btn btn-warning btn-sm">
+                                        <button type="button" @click="openModal('person','update', person)" class="btn btn-warning btn-sm">
                                           <i class="icon-pencil"></i>
                                         </button> &nbsp;
-                                            <template v-if="article.condition">
-                                                <button type="button" class="btn btn-danger btn-sn" @click="deactivateArticle(article.id)">
+                                        <template v-if="person.condition">
+                                                <button type="button" class="btn btn-danger btn-sn" @click="deactivateUser(person.id)">
                                                    <i class="icon-trash"></i>
                                                 </button> 
                                             </template>
                                             <template v-else>
-                                                <button type="button" class="btn btn-info btn-sn" @click="activateArticle(article.id)">
+                                                <button type="button" class="btn btn-info btn-sn" @click="activateUser(person.id)">
                                                    <i class="icon-check"></i>
                                                 </button> 
                                             </template>
-                                       <!-- <button type="button" class="btn btn-danger btn-sm">
-                                          <i class="icon-trash"></i>
-                                        </button>-->
                                     </td>
-                                    <td v-text="article.code"></td>
-                                    <td v-text="article.name"></td>
-                                    <td v-text="article.name_category"></td>
-                                    <td v-text="article.price_vent"></td>
-                                    <td v-text="article.stock"></td>
-                                    <td v-text="article.description"></td>
-                                    <td>
-                                        <div v-if="article.condition">
-                                            <span class="badge badge-success">Activo</span>
-                                        </div>
-
-                                        <div v-else>
-                                        <span class="badge badge-danger">Desactivado</span>
-                                        </div>
-                                    </td>
+                                    <td v-text="person.name"></td> 
+                                    <td v-text="person.type_document"></td>
+                                    <td v-text="person.num_document"></td>
+                                    <td v-text="person.address"></td>
+                                    <td v-text="person.phone"></td>
+                                    <td v-text="person.email"></td>
+                                    <td v-text="person.user"></td>
+                                    <td v-text="person.rol"></td>
+                                   
                                 </tr>
                                 
                             </tbody>
@@ -109,56 +104,79 @@
                         <div class="modal-body">
                             <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
                                 <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="text-input">Categoria</label>
-                                    <div class="col-md-9">
-                                        
-                                        <select class="form-control" v-model="idcategory">
-                                            <option value="0" disabled>Seleccione</option>
-                                            <option v-for="category in arrayCategory" :key="category.id" :value="category.id" v-text="category.name"></option>
-                                        </select>
-
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="text-input">Código</label>
-                                    <div class="col-md-9">
-                                        <input type="text" v-model="code" class="form-control" placeholder="Código de Barras">
-                                        <barcode :value="code" :options="{format: 'EAN-13'}">
-                                            Generando Codigo de Barras.
-                                        </barcode>
-                                        <!--<span class="help-block">(*) Ingrese el nombre de la categoría</span>-->
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
                                     <label class="col-md-3 form-control-label" for="text-input">Nombre</label>
                                     <div class="col-md-9">
-                                        <input type="text" v-model="name" class="form-control" placeholder="Nombre de artículo">
-                                        <!--<span class="help-block">(*) Ingrese el nombre de la categoría</span>-->
+                                        <input type="text" v-model="name" class="form-control" placeholder="Nombre de la persona">
+                                
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="text-input">Precio Venta</label>
+                                    <label class="col-md-3 form-control-label" for="text-input">Tipo de Documento</label>
                                     <div class="col-md-9">
-                                        <input type="number" v-model="price_vent" class="form-control" placeholder="">                                        
+                                        <select v-model="type_document" class="form-control">
+                                            <option value="DNI">DNI</option>
+                                            <option value="INE">INE</option>
+                                            <option value="PASS">PASS</option>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="text-input">Stock</label>
+                                    <label class="col-md-3 form-control-label" for="text-input">Numero</label>
                                     <div class="col-md-9">
-                                        <input type="number" v-model="stock" class="form-control" placeholder="">                                        
+                                        <input type="text" v-model="num_document" class="form-control" placeholder="Numero de Documento">
+                                
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="email-input">Descripción</label>
+                                    <label class="col-md-3 form-control-label" for="text-input">Direccion</label>
                                     <div class="col-md-9">
-                                        <input type="email" v-model="description" class="form-control" placeholder="Ingrese Descripcion">
+                                        <input type="text" v-model="address" class="form-control" placeholder="Direccion">
+                                
                                     </div>
                                 </div>
-                                <div v-show="errorArticle" class="form-group row">
+                                <div class="form-group row">
+                                    <label class="col-md-3 form-control-label" for="text-input">Telefono</label>
+                                    <div class="col-md-9">
+                                        <input type="text" v-model="phone" class="form-control" placeholder="Telefono">
+                                
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-md-3 form-control-label" for="text-input">email</label>
+                                    <div class="col-md-9">
+                                        <input type="email" v-model="email" class="form-control" placeholder="Email">
+                                
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-md-3 form-control-label" for="text-input">Rol (*)</label>
+                                    <div class="col-md-9">
+                                        <select class="form-control" v-model="idrol">
+                                            <option value="0">Seleccione un rol</option>
+                                            <option v-for="rol in arrayRol" :key="rol.id" :value="rol.id" v-text="rol.name"></option>
+                                            
+                                        </select>
+                                </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-md-3 form-control-label" for="text-input">Usuario (*)</label>
+                                    <div class="col-md-9">
+                                        <input type="text" v-model="user" class="form-control" placeholder="Nombre del usuario">
+                                
+                                </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-md-3 form-control-label" for="text-input">Password (*)</label>
+                                    <div class="col-md-9">
+                                        <input type="password" v-model="password" class="form-control" placeholder="Password de acceso">
+                                
+                                    </div>
+                                </div>
+                                
+
+                                <div v-show="errorPerson" class="form-group row">
                                     <div class="text-center text-error">
-                                        <div v-for="error in errorShowMsjArticle" :key="error" v-text="error"></div>
+                                        <div v-for="error in errorShowMsjPerson" :key="error" v-text="error"></div>
                                     </div>
                                 </div>
                                     
@@ -166,8 +184,8 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" @click="closeModal()">Cerrar</button>
-                            <button type="button" v-if="typeAction==1" class="btn btn-primary" @click="registerArticle()">Guardar</button>
-                            <button type="button" v-if="typeAction==2" class="btn btn-primary" @click="updateArticle()">Actualizar</button>
+                            <button type="button" v-if="typeAction==1" class="btn btn-primary" @click="registerPerson()">Guardar</button>
+                            <button type="button" v-if="typeAction==2" class="btn btn-primary" @click="updatePerson()">Actualizar</button>
                         </div>
                     </div>
                     <!-- /.modal-content -->
@@ -182,24 +200,26 @@
 </template>
 
 <script>
-    import VueBarcode from 'vue-barcode';
     export default {
         data (){
            return {
-               article_id : 0,
-               idcategory: 0,
-               name_category :'',
-               code : '',
-               name : '',
-               price_vent: 0,
-               stock : 0,
-               description : '',
-               arrayArticle : [],
+               persona_id : 0,
+               name :'',
+               type_document : 'DNI',
+               num_document : '',
+               address : '',
+               phone : '',
+               email : '',
+               user : '',
+               password: '',
+               idrol : 0,
+               arrayPerson : [],
+               arrayRol : [],
                modal: 0,
                tittlemodal : '',
                typeAction : 0,
-               errorArticle : 0,
-               errorShowMsjArticle : [],
+               errorPerson : 0,
+               errorShowMsjPerson : [],
                pagination : {
                    'total' : 0,
                    'current_page' : 0,
@@ -210,12 +230,8 @@
                },
                offset : 3,
                criterion : 'name',
-               buscar : '',
-               arrayCategory : []
+               buscar : ''
            } 
-        },
-        components: {
-            'barcode': VueBarcode
         },
         computed:{
             isActived: function(){
@@ -245,34 +261,27 @@
             }
         },
         methods : {
-            listArticle (page, buscar, criterion){
+             listPerson (page,buscar,criterion){
                 let me=this;
-                var url = '/article?page=' + page + '&buscar='+ buscar + '&criterion='+ criterion;
+                var url= '/user?page=' + page + '&buscar='+ buscar + '&criterion='+ criterion;
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
-                    me.arrayArticle = respuesta.articles.data;
+                    me.arrayPerson = respuesta.persons.data;
                     me.pagination= respuesta.pagination;
-                // handle success
-                console.log(response);
                 })
                 .catch(function (error) {
-                // handle error
-                 console.log(error);
+                    console.log(error);
                 });
             },
-            selectCategory(){
+            selectRol(){
                 let me=this;
-                var url = '/category/selectCategory?page';
+                var url= '/rol/selectRol';
                 axios.get(url).then(function (response) {
-                   // console.log(response);
                     var respuesta= response.data;
-                    me.arrayCategory = respuesta.categories;
-                // handle success
-                console.log(response);
+                    me.arrayRol = respuesta.roles;
                 })
                 .catch(function (error) {
-                // handle error
-                 console.log(error);
+                    console.log(error);
                 });
             },
             changePage (page, buscar, criterion){
@@ -280,53 +289,127 @@
                 //Actualizar pagina actual
                 me.pagination.current_page = page;
                 //Envia la petición para vizualizar la data desde esa pagina 
-                me.listArticle(page, buscar, criterion);
+                me.listPerson(page, buscar, criterion);
             },
-            registerArticle(){
-                if (this.valideArticle()){
-                    return;
-                }
-                let me = this;
-                
-
-                axios.post('/article/register',{
-                    'idcategory': this.idcategory,
-                    'code': this.code,
-                    'name': this.name,
-                    'stock': this.stock,
-                    'price_vent': this.price_vent,
-                    'description': this.description
-                }).then(function (response) {
-                    me.closeModal();
-                    me.listArticle(1,'','name');
-                }).catch(function (error) {
-                    console.log(error);
-                });
-            },
-            updateArticle(){
-                if (this.valideArticle()){
+            registerPerson(){
+                if (this.validePerson()){
                     return;
                 }
                 let me = this;
 
-                axios.put('/article/update',{
-                     'idcategory': this.idcategory,
-                    'code': this.code,
+                axios.post('/user/register',{
                     'name': this.name,
-                    'stock': this.stock,
-                    'price_vent': this.price_vent,
-                    'description': this.description,
-                    'id': this.article_id
+                    'type_document': this.type_document,
+                    'num_document': this.num_document,
+                    'address': this.address,
+                    'phone': this.phone,
+                    'email': this.email,
+                    'user': this.user,
+                    'password': this.password,
+                    'idrol': this.idrol
                 }).then(function (response) {
                     me.closeModal();
-                    me.listArticle(1,'','name');
+                    me.listPerson(1,'','name');
                 }).catch(function (error) {
                     console.log(error);
                 });
             },
-            deactivateArticle(id){
+            updatePerson(){
+                if (this.validePerson()){
+                    return;
+                }
+                let me = this;
+
+                axios.put('/user/update',{
+                    'name': this.name,
+                    'type_document': this.type_document,
+                    'num_document': this.num_document,
+                    'address': this.address,
+                    'phone': this.phone,
+                    'email': this.email,
+                    'user': this.user,
+                    'password': this.password,
+                    'idrol' : this.idrol,
+                    'id': this.persona_id
+                }).then(function (response) {
+                    me.closeModal();
+                    me.listPerson(1,'','name');
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            },
+            validePerson(){
+                this.errorPerson=0;
+                this.errorShowMsjPerson =[];
+
+                if (!this.name) this.errorShowMsjPerson.push("El nombre de la persona no puede estar vacío.");
+                if (!this.user) this.errorShowMsjPerson.push("El nombre de usuario no puede estar vacío.");
+                if (!this.password) this.errorShowMsjPerson.push("El password no puede estar vacío.");
+                if (!this.idrol) this.errorShowMsjPerson.push("Debes seleccionar un rol");
+                if (this.errorShowMsjPerson.length) this.errorPerson = 1;
+
+                return this.errorPerson;
+            },
+            closeModal(){
+                this.modal =0;
+                this.tittlemodal='';
+                this.name='';
+                this.type_document='DNI';
+                this.num_document='';
+                this.address='';
+                this.phone='';
+                this.email='';
+                this.user='';
+                this.password='';
+                this.idrol=0;
+                this.errorPerson=0;
+
+            },
+            openModal(model, action, data = []){
+              this.selectRol();
+              switch(model){
+                  case "person":
+                      {
+                          switch(action){
+                              case 'register':{
+                                  this.modal = 1;
+                                  this.tittlemodal = 'Registrar Usuario';
+                                  this.name='';
+                                  this.type_document='DNI';
+                                  this.num_document='';
+                                  this.address='';
+                                  this.phone='';
+                                  this.email='';
+                                  this.user='';
+                                  this.password='';
+                                  this.idrol=0;
+                                  this.typeAction = 1;
+                                  break;
+                              }
+                              case 'update':{
+                                  this.modal =1;
+                                  this.tittlemodal = 'Actualizar usuario';
+                                  this.typeAction = 2;
+                                  this.persona_id = data['id'];
+                                  this.name = data['name'];
+                                  this.type_document = data['type_document'];
+                                  this.num_document = data['num_document'];
+                                  this.address = data['address'];
+                                  this.phone = data['phone'];
+                                  this.email = data['email'];
+                                  this.user = data['user'];
+                                  this.password = data['password'];
+                                  this.idrol = data['idrol'];
+                                  break;
+                                 // console.log(data);
+                              }
+                          }
+                      }
+              }
+            },
+            deactivateUser(id){
                  swal({
-                title: 'Esta seguro de desactivar este articulo?',
+                title: 'Esta seguro de desactivar esta Usuario?',
                 type: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -341,10 +424,10 @@
                 if (result.value) {
                     let me = this;
 
-                    axios.put('/article/deactivate',{
+                    axios.put('/user/deactivate',{
                         'id': id
                     }).then(function (response) {
-                        me.listArticle(1,'','name');
+                        me.listPerson(1,'','name');
                         swal(
                         'Desactivado!',
                         'El registro ha sido desactivado con éxito.',
@@ -361,9 +444,9 @@
                 }
                 })
             },
-            activateArticle(id){
+            activateUser(id){
                  swal({
-                title: 'Esta seguro de activar este articulo?',
+                title: 'Esta seguro de activar este Usuario?',
                 type: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -378,10 +461,10 @@
                 if (result.value) {
                     let me = this;
 
-                    axios.put('/article/activate',{
+                    axios.put('/user/activate',{
                         'id': id
                     }).then(function (response) {
-                        me.listArticle(1,'','name');
+                        me.listPerson(1,'','name');
                         swal(
                         'Activado!',
                         'El registro ha sido desactivado con éxito.',
@@ -398,72 +481,9 @@
                 }
                 })
             },
-            valideArticle(){
-                this.errorArticle=0;
-                this.errorShowMsjArticle =[];
-
-                if (this.idcategory==0) this.errorShowMsjArticle.push("Seleccione una categoría.");
-                if (!this.name) this.errorShowMsjArticle.push("El nombre del artículo no puede estar vacío.");
-                if (!this.stock) this.errorShowMsjArticle.push("El stock del artículo debe ser un número y no puede estar vacío.");
-                if (!this.price_vent) this.errorShowMsjArticle.push("El precio venta del artículo debe ser un número y no puede estar vacío.");
-
-                if (this.errorShowMsjArticle.length) this.errorArticle = 1;
-
-                return this.errorArticle;
-            },
-            closeModal(){
-                this.modal =0;
-                this.tittlemodal='';
-                this.idcategory=0;
-                this.name_category = '';
-                this.code = '';
-                this.name = '';
-                this.price_vent = 0;
-                this.stock = 0;
-                this.description = '';
-                this.errorArticle=0;
-
-            },
-            openModal(model, action, data = []){
-              switch(model){
-                  case "article":
-                      {
-                          switch(action){
-                              case 'register':{
-                                  this.modal = 1;
-                                  this.tittlemodal = 'Registrar Articulo';
-                                  this.idcategory = 0;
-                                  this.name_category = '';
-                                  this.code = '';
-                                  this.name = '';
-                                  this.price_vent = 0;
-                                  this.stock = 0;
-                                  this.description = '';
-                                  this.typeAction = 1;
-                                  break;
-                              }
-                              case 'update':{
-                                  this.modal =1;
-                                  this.tittlemodal = 'Actualizar Articulo';
-                                  this.typeAction = 2;
-                                  this.article_id = data['id'];
-                                  this.idcategory = data['idcategory'];
-                                  this.code = data['code'];
-                                  this.name = data['name'];
-                                  this.stock = data['stock'];
-                                  this.price_vent=data['price_vent'];
-                                  this.description = data['description'];
-                                  break;
-                                 // console.log(data);
-                              }
-                          }
-                      }
-              }
-              this.selectCategory();
-            }
         },
         mounted() {
-            this.listArticle(1, this.buscar, this.criterion);
+            this.listPerson(1, this.buscar, this.criterion);
             //console.log('Component mounted.')
 
         }

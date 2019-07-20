@@ -21,7 +21,8 @@ window.Vue = require('vue');
  Vue.component('client-component', require('./components/Client.vue'));
  Vue.component('supplier-component', require('./components/Supplier.vue'));
  Vue.component('rol-component', require('./components/Rol.vue'));
-const app = new Vue({
+ Vue.component('user-component', require('./components/User.vue'));
+ const app = new Vue({
     el: '#app',
     data :{
         menu : 0

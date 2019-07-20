@@ -148,14 +148,15 @@
                 me.pagination.current_page = page;
                 //Envia la petición para vizualizar la data desde esa pagina 
                 me.listRol(page, buscar, criterion);
+            }
             },
         mounted() {
             this.listRol(1, this.buscar, this.criterion);
             //console.log('Component mounted.')
 
         }
+    
     }
-}
 </script>
 <style>
     .modal-content{

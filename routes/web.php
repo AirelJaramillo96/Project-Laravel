@@ -38,3 +38,11 @@ Route::post('/supplier/register','SupplierController@store');
 Route::put('/supplier/update','SupplierController@update');
 
 Route::get('/rol','RolController@index');
+Route::get('/rol/selectRol','RolController@selectRol');
+
+Route::get('/user','UserController@index');
+Route::post('/user/register','UserController@store');
+Route::put('/user/update','UserController@update');
+Route::put('/user/deactivate','UserController@deactivate');
+Route::put('/user/activate','UserController@activate');
+
