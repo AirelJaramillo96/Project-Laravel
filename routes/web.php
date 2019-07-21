@@ -11,9 +11,9 @@
 |
 */
 
-Route::get('/', function () {
+Route::get('/main', function () {
     return view('contenido/contenido');
-});
+})->name('main');
 
 Route::get('/category','CategoryController@index');
 Route::post('/category/register','CategoryController@store');
@@ -47,6 +47,7 @@ Route::put('/user/deactivate','UserController@deactivate');
 Route::put('/user/activate','UserController@activate');
 
 
-Auth::routes();
+Route::get('/','Auth\LoginController@showLoginForm');
+Route::post('/login','Auth\LoginController@login')->name('login');
 
 Route::get('/home', 'HomeController@index')->name('home');

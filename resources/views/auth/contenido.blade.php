@@ -15,8 +15,6 @@
   
   <link href="css/plantilla.css" rel="stylesheet">
 
-  <!-- Main styles for this application -->
-  <link href="css/style.css" rel="stylesheet">
 
 </head>
 
