@@ -22,6 +22,7 @@ window.Vue = require('vue');
  Vue.component('supplier-component', require('./components/Supplier.vue'));
  Vue.component('rol-component', require('./components/Rol.vue'));
  Vue.component('user-component', require('./components/User.vue'));
+ Vue.component('ingreso-component', require('./components/Ingreso.vue'));
  const app = new Vue({
     el: '#app',
     data :{
