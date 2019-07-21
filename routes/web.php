@@ -46,3 +46,7 @@ Route::put('/user/update','UserController@update');
 Route::put('/user/deactivate','UserController@deactivate');
 Route::put('/user/activate','UserController@activate');
 
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');
