@@ -10,10 +10,12 @@
                 <div class="card">
                     <div class="card-header">
                         <i class="fa fa-align-justify"></i> Ingresos
-                        <button type="button" @click="openModal('ingreso','register')" class="btn btn-secondary" >
+                        <button type="button" @click="showDetail()" class="btn btn-secondary" >
                             <i class="icon-plus"></i>&nbsp;Nuevo
                         </button>
                     </div>
+                    <!--Listado-->
+                    <template v-if="listado">
                     <div class="card-body">
                         <div class="form-group row">
                             <div class="col-md-6">
@@ -85,6 +87,160 @@
                             </ul>
                         </nav>
                     </div>
+                    </template>
+                    <!--Fin Listado-->
+                    <!--Detalle-->
+                    <template v-else>
+                    <div class="card-body">
+                        <div class="form-group row border">
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <label for="">Proveedor(*)</label>
+                                    <select class="form-control">
+
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                    <label for="">Impuesto(*)</label>
+                                    <input type="text" class="form-control" v-model="tax">
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Tipo Comprobante(*)</label>
+                                    <select class="form-control" v-model="type_voucher">
+                                        <option value="0">Seleccione</option>
+                                        <option value="BOLETA">BOLETA</option>
+                                        <option value="FACTURA">FACTURA</option>
+                                        <option value="TICKET">TICKET</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Serie Comprobante</label>
+                                    <input type="text" class="form-control" v-model="serie_voucher" placeholder="000x">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Número Comprobante(*)</label>
+                                    <input type="text" class="form-control" v-model="num_voucher" placeholder="000xx">
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group row border">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Artículo</label>
+                                    <div class="form-inline">
+                                        <input type="text" class="form-control" v-model="idarticle" placeholder="Ingrese artículo">
+                                        <button class="btn btn-primary">...</button>
+                                    </div>                                    
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label>Precio</label>
+                                    <input type="number" value="0" step="any" class="form-control" v-model="price">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label>Cantidad</label>
+                                    <input type="number" value="0" class="form-control" v-model="quantity">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <button class="btn btn-success form-control btnagregar"><i class="icon-plus"></i></button>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group row">
+                            <div class="table-responsive col-md-12">
+                                <table class="table table-bordered table-striped table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Opciones</th>
+                                            <th>Artículo</th>
+                                            <th>Precio</th>
+                                            <th>Cantidad</th>
+                                            <th>Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <!--Eliminar el detalle del ingreso-->
+                                                <button type="button" class="btn btn-danger btn-sm">
+                                                    <i class="icon-close"></i>
+                                                </button>
+                                            </td>
+                                            <td>
+                                                <!--Nombre articulo-->
+                                                Artículo n
+                                            </td>
+                                            <td>
+                                                <!--input para el ingreso-->
+                                                <input type="number" value="3" class="form-control">
+                                            </td>
+                                            <td>
+                                                <!--Valor del ingreso-->
+                                                <input type="number" value="2" class="form-control">
+                                            </td>
+                                            <td>
+                                                <!--Subtotal-->
+                                                $ 6.00
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <button type="button" class="btn btn-danger btn-sm">
+                                                    <i class="icon-close"></i>
+                                                </button>
+                                            </td>
+                                            <td>
+                                                Artículo n
+                                            </td>
+                                            <td>
+                                                <input type="number" value="3" class="form-control">
+                                            </td>
+                                            <td>
+                                                <input type="number" value="2" class="form-control">
+                                            </td>
+                                            <td>
+                                                $ 6.00
+                                            </td>
+                                        </tr>
+                                        <tr style="background-color: #CEECF5;">
+                                            <td colspan="4" align="right"><strong>Total Parcial:</strong></td>
+                                            <td>$ 5</td>
+                                        </tr>
+                                        <tr style="background-color: #CEECF5;">
+                                            <td colspan="4" align="right"><strong>Total Impuesto:</strong></td>
+                                            <td>$ 1</td>
+                                        </tr>
+                                        <tr style="background-color: #CEECF5;">
+                                            <td colspan="4" align="right"><strong>Total Neto:</strong></td>
+                                            <td>$ 6</td>
+                                        </tr>
+                                    </tbody>                                    
+                                </table>
+                            </div>
+
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-12">
+                                <button type="button" @click="hideDetail()" class="btn btn-secondary">Cerrar</button>
+                                <button type="button" class="btn btn-primary" @click="registrarIngreso()">Registrar Compra</button>
+                            </div>
+                        </div>
+                    </div>
+                    </template>
+                    <!--Fin Detalle-->
                 </div>
                 <!-- Fin ejemplo de tabla Listado -->
             </div>
@@ -99,85 +255,7 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="text-input">Nombre</label>
-                                    <div class="col-md-9">
-                                        <input type="text" v-model="name" class="form-control" placeholder="Nombre de la persona">
-                                
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="text-input">Tipo de Documento</label>
-                                    <div class="col-md-9">
-                                        <select v-model="type_document" class="form-control">
-                                            <option value="DNI">DNI</option>
-                                            <option value="INE">INE</option>
-                                            <option value="PASS">PASS</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="text-input">Numero</label>
-                                    <div class="col-md-9">
-                                        <input type="text" v-model="num_document" class="form-control" placeholder="Numero de Documento">
-                                
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="text-input">Direccion</label>
-                                    <div class="col-md-9">
-                                        <input type="text" v-model="address" class="form-control" placeholder="Direccion">
-                                
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="text-input">Telefono</label>
-                                    <div class="col-md-9">
-                                        <input type="text" v-model="phone" class="form-control" placeholder="Telefono">
-                                
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="text-input">email</label>
-                                    <div class="col-md-9">
-                                        <input type="email" v-model="email" class="form-control" placeholder="Email">
-                                
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="text-input">Rol (*)</label>
-                                    <div class="col-md-9">
-                                        <select class="form-control" v-model="idrol">
-                                            <option value="0">Seleccione un rol</option>
-                                            <option v-for="rol in arrayRol" :key="rol.id" :value="rol.id" v-text="rol.name"></option>
-                                            
-                                        </select>
-                                </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="text-input">Usuario (*)</label>
-                                    <div class="col-md-9">
-                                        <input type="text" v-model="user" class="form-control" placeholder="Nombre del usuario">
-                                
-                                </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="text-input">Password (*)</label>
-                                    <div class="col-md-9">
-                                        <input type="password" v-model="password" class="form-control" placeholder="Password de acceso">
-                                
-                                    </div>
-                                </div>
-                                
-
-                                <div v-show="errorPerson" class="form-group row">
-                                    <div class="text-center text-error">
-                                        <div v-for="error in errorShowMsjPerson" :key="error" v-text="error"></div>
-                                    </div>
-                                </div>
-                                    
-                            </form>
+                            
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" @click="closeModal()">Cerrar</button>
@@ -209,6 +287,7 @@
                total : 0.0,
                arrayIngreso : [],
                arrayDetalle : [],
+               listado: 1,
                
                modal: 0,
                tittlemodal : '',
@@ -344,6 +423,12 @@
                 if (this.errorShowMsjPerson.length) this.errorPerson = 1;
 
                 return this.errorPerson;
+            },
+            showDetail(){
+                this.listado=0;
+            },
+            hideDetail(){
+                this.listado=1;
             },
             closeModal(){
                 this.modal =0;
@@ -504,6 +589,11 @@
     .text-error{
         color: red !important;
         font-weight: bold;
+    }
+    @media (min-witdh: 600px){
+        .btnagregar {
+            margin-top: 2rem;
+        }
     }
 </style>
 
