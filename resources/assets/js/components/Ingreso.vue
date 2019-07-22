@@ -136,6 +136,15 @@
                                     <input type="text" class="form-control" v-model="num_voucher" placeholder="000xx">
                                 </div>
                             </div>
+                            <div class="col-md-12">
+                                <div v-show="errorEntry" class="form-group row div-error">
+                                    <div class="text-center text-error">
+                                        <div v-for="error in errorShowMsjEntry" :key="error" v-text="error">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
                         </div>
                         <div class="form-group row border">
@@ -347,8 +356,8 @@
                modal: 0,
                tittlemodal : '',
                typeAction : 0,
-               errorIngreso : 0,
-               errorShowMsjIngreso : [],
+               errorEntry : 0,
+               errorShowMsjEntry : [],
                pagination : {
                    'total' : 0,
                    'current_page' : 0,
@@ -541,25 +550,35 @@
                  console.log(error);
                 });
             },
-            registerPerson(){
-                if (this.validePerson()){
+            registrarIngreso(){
+                if (this.valideEntry()){
                     return;
                 }
                 let me = this;
 
-                axios.post('/user/register',{
-                    'name': this.name,
-                    'type_document': this.type_document,
-                    'num_document': this.num_document,
-                    'address': this.address,
-                    'phone': this.phone,
-                    'email': this.email,
-                    'user': this.user,
-                    'password': this.password,
-                    'idrol': this.idrol
+                axios.post('/ingreso/register',{
+                    'idsupplier': this.idsupplier,
+                    'type_voucher': this.type_voucher,
+                    'serie_voucher' : this.serie_voucher,
+                    'num_voucher': this.num_voucher,
+                    'tax': this.tax,
+                    'total': this.total,
+                    'data': this.arrayDetalle
+
                 }).then(function (response) {
-                    me.closeModal();
-                    me.listPerson(1,'','name');
+                   me.listado=1;
+                   me.listIngreso(1,'','num_voucher');
+                   me.idproveedor=0;
+                    me.type_voucher ='BOLETA';
+                    me.serie_voucher='';
+                    me.num_voucher='';
+                    me.tax=0.18;
+                    me.total=0.0;
+                    me.idarticle=0;
+                    me.article='';
+                    me.quantity=0;
+                    me.price=0;
+                    me.arrayDetalle=[];
                 }).catch(function (error) {
                     console.log(error);
                 });
@@ -588,20 +607,37 @@
                     console.log(error);
                 });
             },
-            validePerson(){
-                this.errorPerson=0;
-                this.errorShowMsjPerson =[];
+            valideEntry(){
+                this.errorEntry=0;
+                this.errorShowMsjEntry =[];
 
-                if (!this.name) this.errorShowMsjPerson.push("El nombre de la persona no puede estar vacío.");
-                if (!this.user) this.errorShowMsjPerson.push("El nombre de usuario no puede estar vacío.");
-                if (!this.password) this.errorShowMsjPerson.push("El password no puede estar vacío.");
-                if (!this.idrol) this.errorShowMsjPerson.push("Debes seleccionar un rol");
-                if (this.errorShowMsjPerson.length) this.errorPerson = 1;
+                if (this.idsupplier==0) this.errorShowMsjEntry.push("Seleccione un Proveedor");
+                if (this.type_voucher==0) this.errorShowMsjEntry.push("Seleccione el comprobante");
+                if (!this.num_voucher) this.errorShowMsjEntry.push("Ingrese el número de comprobante");
+                if (!this.tax) this.errorShowMsjEntry.push("Ingrese el impuesto de compra");
+                if (this.arrayDetalle.length<=0) this.errorShowMsjEntry.push("Ingrese detalles");
 
-                return this.errorPerson;
+
+
+                if (this.errorShowMsjEntry.length) this.errorEntry = 1;
+
+                return this.errorEntry;
             },
             showDetail(){
-                this.listado=0;
+                let me=this;
+                me.listado=0;
+                
+                me.idproveedor=0;
+                me.type_voucher ='BOLETA';
+                me.serie_voucher='';
+                me.num_voucher='';
+                me.tax=0.18;
+                me.total=0.0;
+                me.idarticle=0;
+                me.article='';
+                me.quantity=0;
+                me.price=0;
+                me.arrayDetalle=[];
             },
             hideDetail(){
                 this.listado=1;

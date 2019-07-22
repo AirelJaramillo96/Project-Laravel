@@ -61,7 +61,7 @@ class IngresoController extends Controller
             $ingreso->serie_voucher = $request->serie_voucher;
             $ingreso->num_voucher = $request->num_voucher;
             $ingreso->date_hour = $mytime ->toDateString();
-            $ingreso->tax = $request->$tax;
+            $ingreso->tax = $request->tax;
             $ingreso->total = $request->total;
             $ingreso->state = 'Registrado';
             $ingreso->save();
