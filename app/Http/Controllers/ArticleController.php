@@ -28,6 +28,7 @@ class ArticleController extends Controller
         }
         
 
+
         return [
             'pagination' => [
                 'total'         =>  $articles->total(),
@@ -40,6 +41,33 @@ class ArticleController extends Controller
             'articles' => $articles
         ];
     }
+
+    public function listarArticulo(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+ 
+        $buscar = $request->buscar;
+        $criterion = $request->criterion;
+         
+        if ($buscar == ''){
+            $articles = Article::join('categories','articles.idcategory','=','categories.id')
+            ->select('articles.id','articles.idcategory','articles.code','articles.name','categories.name as name_category', 'articles.price_vent','articles.stock','articles.description','articles.condition')
+            ->orderBy('articles.id', 'desc')->paginate(10);
+        }
+        else{
+            $articles = Article::join('categories','articles.idcategory','=','categories.id')
+            ->select('articles.id','articles.idcategory','articles.code','articles.name','categories.name as name_category', 'articles.price_vent','articles.stock','articles.description','articles.condition')
+            ->where('articles.'.$criterion, 'like', '%'. $buscar . '%')
+            ->orderBy('articles.id', 'desc')->paginate(10);
+
+        }
+      
+            return ['articles' => $articles];
+
+    }
+
+
+
 
     public function buscarArticulo(Request $request){
         if (!$request->ajax()) return redirect('/');

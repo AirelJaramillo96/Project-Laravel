@@ -141,29 +141,29 @@
                         <div class="form-group row border">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label>Artículo</label>
+                                    <label>Artículo<span style="color:red;" v-show="idarticle==0">(*Seleccione)</span></label>
                                     <div class="form-inline">
                                         <input type="text" class="form-control" v-model="code" @keyup.enter="buscarArticulo()" placeholder="Ingrese artículo">
-                                        <button class="btn btn-primary">...</button>
+                                        <button @click="openModal()" class="btn btn-primary">...</button>
                                         <input type="text" readonly class="form-control" v-model="article">
                                     </div>                                    
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group">
-                                    <label>Precio</label>
+                                    <label>Precio<span style="color:red;" v-show="price==0">(*Ingrese precio)</span></label>
                                     <input type="number" value="0" step="any" class="form-control" v-model="price">
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group">
-                                    <label>Cantidad</label>
+                                    <label>Cantidad<span style="color:red;" v-show="quantity==0">(*Ingrese Cantidad)</span></label>
                                     <input type="number" value="0" class="form-control" v-model="quantity">
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group">
-                                    <button class="btn btn-success form-control btnagregar"><i class="icon-plus"></i></button>
+                                    <button @click="agregarDetalle()" class="btn btn-success form-control btnagregar"><i class="icon-plus"></i></button>
                                 </div>
                             </div>
 
@@ -180,63 +180,51 @@
                                             <th>Subtotal</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        <tr>
+                                    <tbody v-if="arrayDetalle.length">
+                                        <tr v-for="(detalle,index) in arrayDetalle" :key="detalle.id">
                                             <td>
-                                                <!--Eliminar el detalle del ingreso-->
-                                                <button type="button" class="btn btn-danger btn-sm">
+                                                <button @click="eliminarDetalle(index)" type="button" class="btn btn-danger btn-sm">
                                                     <i class="icon-close"></i>
                                                 </button>
                                             </td>
-                                            <td>
+                                            <td v-text="detalle.article">
                                                 <!--Nombre articulo-->
-                                                Artículo n
+                                               
                                             </td>
                                             <td>
                                                 <!--input para el ingreso-->
-                                                <input type="number" value="3" class="form-control">
+                                                <input v-model="detalle.price" type="number" value="3" class="form-control">
                                             </td>
                                             <td>
                                                 <!--Valor del ingreso-->
-                                                <input type="number" value="2" class="form-control">
+                                                <input v-model="detalle.quantity" type="number" value="2" class="form-control">
                                             </td>
                                             <td>
                                                 <!--Subtotal-->
-                                                $ 6.00
+                                                {{detalle.price*detalle.quantity}}
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td>
-                                                <button type="button" class="btn btn-danger btn-sm">
-                                                    <i class="icon-close"></i>
-                                                </button>
-                                            </td>
-                                            <td>
-                                                Artículo n
-                                            </td>
-                                            <td>
-                                                <input type="number" value="3" class="form-control">
-                                            </td>
-                                            <td>
-                                                <input type="number" value="2" class="form-control">
-                                            </td>
-                                            <td>
-                                                $ 6.00
-                                            </td>
-                                        </tr>
+                                        
                                         <tr style="background-color: #CEECF5;">
                                             <td colspan="4" align="right"><strong>Total Parcial:</strong></td>
-                                            <td>$ 5</td>
+                                            <td> {{totalPartial=(total-totalTax).toFixed(2)}}</td>
                                         </tr>
                                         <tr style="background-color: #CEECF5;">
                                             <td colspan="4" align="right"><strong>Total Impuesto:</strong></td>
-                                            <td>$ 1</td>
+                                            <td> {{totalTax=((total*tax)/(1+tax)).toFixed(2)}}</td>
                                         </tr>
                                         <tr style="background-color: #CEECF5;">
                                             <td colspan="4" align="right"><strong>Total Neto:</strong></td>
-                                            <td>$ 6</td>
+                                            <td> {{total=calcularTotal}}</td>
                                         </tr>
-                                    </tbody>                                    
+                                    </tbody> 
+                                    <tbody v-else>
+                                        <tr>
+                                            <td colspan="5">
+                                                No hay articulos agregados
+                                            </td>
+                                        </tr>
+                                    </tbody>                                   
                                 </table>
                             </div>
 
@@ -264,7 +252,62 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            
+                            <div class="form-group row">
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <select class="form-control col-md-3" v-model="criterionA">
+                                        <option value="name">Nombre</option>
+                                        <option value="description">Descripción</option>
+                                        <option value="description">Codigo</option>
+                                        </select>
+                                        <input type="text" v-model="buscarA" @keyup.enter="listArticle(buscarA,criterionA)" class="form-control" placeholder="Texto a buscar">
+                                        <button type="submit" @click="listArticle(buscarA,criterionA)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Opciones</th>
+                                                <th>Codigo</th>
+                                                <th>Nombre</th>
+                                                <th>Categoria</th>
+                                                <th>Precio Venta</th>
+                                                <th>Stock</th>
+                                                <th>Estado</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="article in arrayArticle" :key="article.id">
+                                                <td>
+                                                    <button type="button" @click="agregarDetalleModal(article)" class="btn btn-success btn-sm">
+                                                    <i class="icon-check"></i>
+                                                    </button>
+                                                <!-- <button type="button" class="btn btn-danger btn-sm">
+                                                    <i class="icon-trash"></i>
+                                                    </button>-->
+                                                </td>
+                                                <td v-text="article.code"></td>
+                                                <td v-text="article.name"></td>
+                                                <td v-text="article.name_category"></td>
+                                                <td v-text="article.price_vent"></td>
+                                                <td v-text="article.stock"></td>
+                                                <td>
+                                                    <div v-if="article.condition">
+                                                        <span class="badge badge-success">Activo</span>
+                                                    </div>
+
+                                                    <div v-else>
+                                                    <span class="badge badge-danger">Desactivado</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            
+                                        </tbody>
+                                    </table>
+
+                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" @click="closeModal()">Cerrar</button>
@@ -295,6 +338,8 @@
                num_voucher : '',
                tax : 0.18,
                total : 0.0,
+               totalTax : 0.0,
+               totalPartial : 0.0,
                arrayIngreso : [],
                arraySupplier : [],
                arrayDetalle : [],
@@ -315,6 +360,8 @@
                offset : 3,
                criterion : 'num_voucher',
                buscar : '',
+               criterionA:'name',
+               buscarA:'',
                arrayArticle : [],
                idarticle : 0,
                code : '',
@@ -349,6 +396,13 @@
                     from++;
                 }
                 return pagesArray;
+            },
+            calcularTotal: function(){
+                var resultado=0.0;
+                for(var i=0;i<this.arrayDetalle.length;i++){
+                    resultado=resultado+(this.arrayDetalle[i].price*this.arrayDetalle[i].quantity)
+                }
+                return resultado;
             }
         },
         methods : {
@@ -410,6 +464,82 @@
                 me.pagination.current_page = page;
                 //Envia la petición para vizualizar la data desde esa pagina 
                 me.listIngreso(page, buscar, criterion);
+            },
+            encuentra(id){
+                var sw=0;
+                for(var i=0;i<this.arrayDetalle.length;i++){
+                    if(this.arrayDetalle[i].idarticle==id){
+                        sw=true;
+                    }
+                }
+                return sw;
+            },
+            eliminarDetalle(index){
+                let me = this;
+                me.arrayDetalle.splice(index, 1);
+            },
+            agregarDetalle(){
+                let me=this;
+                if(me.idarticle==0 || me.quantity==0 || me.price==0){
+
+                }
+                else{
+                    if(me.encuentra(me.idarticle)){
+                         swal({
+                            type: 'error',
+                            title: 'Error...',
+                            text: 'Ese artículo ya se encuentra agregado!',
+                            })
+                    }else{
+                        me.arrayDetalle.push({
+                            idarticle: me.idarticle,
+                            article: me.article,
+                            quantity: me.quantity,
+                            price: me.price
+                        });
+                        me.code="";
+                        me.idarticle=0;
+                        me.article="";
+                        me.quantity=0;
+                        me.price=0;
+
+                    }
+                
+                }
+                
+            },
+            agregarDetalleModal(data =[]){
+
+               let me=this;
+               if(me.encuentra(data['id'])){
+                         swal({
+                            type: 'error',
+                            title: 'Error...',
+                            text: 'Ese artículo ya se encuentra agregado!',
+                            })
+                    }else{
+                        me.arrayDetalle.push({
+                            idarticle: data['id'],
+                            article: data['name'],
+                            quantity: 1,
+                            price: 1
+                        });
+
+                    }
+            },
+            listArticle (buscar, criterion){
+                let me=this;
+                var url = '/article/listarArticulo?buscar='+ buscar + '&criterion='+ criterion;
+                axios.get(url).then(function (response) {
+                    var respuesta= response.data;
+                    me.arrayArticle = respuesta.articles.data;
+                // handle success
+                console.log(response);
+                })
+                .catch(function (error) {
+                // handle error
+                 console.log(error);
+                });
             },
             registerPerson(){
                 if (this.validePerson()){
@@ -479,59 +609,13 @@
             closeModal(){
                 this.modal =0;
                 this.tittlemodal='';
-                this.name='';
-                this.type_document='DNI';
-                this.num_document='';
-                this.address='';
-                this.phone='';
-                this.email='';
-                this.user='';
-                this.password='';
-                this.idrol=0;
-                this.errorPerson=0;
-
+                
             },
-            openModal(model, action, data = []){
-              this.selectRol();
-              switch(model){
-                  case "person":
-                      {
-                          switch(action){
-                              case 'register':{
-                                  this.modal = 1;
-                                  this.tittlemodal = 'Registrar Usuario';
-                                  this.name='';
-                                  this.type_document='DNI';
-                                  this.num_document='';
-                                  this.address='';
-                                  this.phone='';
-                                  this.email='';
-                                  this.user='';
-                                  this.password='';
-                                  this.idrol=0;
-                                  this.typeAction = 1;
-                                  break;
-                              }
-                              case 'update':{
-                                  this.modal =1;
-                                  this.tittlemodal = 'Actualizar usuario';
-                                  this.typeAction = 2;
-                                  this.persona_id = data['id'];
-                                  this.name = data['name'];
-                                  this.type_document = data['type_document'];
-                                  this.num_document = data['num_document'];
-                                  this.address = data['address'];
-                                  this.phone = data['phone'];
-                                  this.email = data['email'];
-                                  this.user = data['user'];
-                                  this.password = data['password'];
-                                  this.idrol = data['idrol'];
-                                  break;
-                                 // console.log(data);
-                              }
-                          }
-                      }
-              }
+            openModal(){
+                this.arrayArticle =[];
+                this.modal = 1;
+                this.tittlemodal = 'Seleccionar Articulo';
+                                  
             },
             deactivateUser(id){
                  swal({
