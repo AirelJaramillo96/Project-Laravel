@@ -96,9 +96,17 @@
                             <div class="col-md-9">
                                 <div class="form-group">
                                     <label for="">Proveedor(*)</label>
-                                    <select class="form-control">
+                                    <v-select
+                                        :on-search="selectSupplier"
+                                        label="name"
+                                        :options="arraySupplier"
+                                        placeholder="Buscar Proveedores..."
+                                        :onChange="getDataSupplier"                                        
+                                    >
+                                    <template slot="no-options">                                    Busqueda por nombre o nit..
+                                    </template>
 
-                                    </select>
+                                    </v-select>
                                 </div>
                             </div>
                             <div class="col-md-3">
@@ -275,6 +283,7 @@
 </template>
 
 <script>
+    import vSelect from 'vue-select';
     export default {
         data (){
            return {
@@ -286,6 +295,7 @@
                tax : 0.18,
                total : 0.0,
                arrayIngreso : [],
+               arraySupplier : [],
                arrayDetalle : [],
                listado: 1,
                
@@ -306,6 +316,9 @@
                criterion : 'num_voucher',
                buscar : ''
            } 
+        },
+        components:{
+            vSelect
         },
         computed:{
             isActived: function(){
@@ -347,16 +360,25 @@
                     console.log(error);
                 });
             },
-            selectRol(){
+            selectSupplier(search,loading){
                 let me=this;
-                var url= '/rol/selectRol';
+                loading(true)
+
+                var url= '/supplier/selectSupplier?filter='+search;
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
-                    me.arrayRol = respuesta.roles;
+                    q: search
+                    me.arraySupplier = respuesta.suppliers;
+                    loading(false)
                 })
                 .catch(function (error) {
                     console.log(error);
                 });
+            },
+            getDataSupplier(val1){
+                let me = this;
+                me.loading = true;
+                me.idsupplier = val1.id;
             },
             changePage (page, buscar, criterion){
                 let me = this;
