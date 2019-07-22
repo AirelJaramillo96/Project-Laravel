@@ -48556,6 +48556,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -48572,7 +48573,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             arraySupplier: [],
             arrayDetalle: [],
             listado: 1,
-
             modal: 0,
             tittlemodal: '',
             typeAction: 0,
@@ -48588,7 +48588,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             },
             offset: 3,
             criterion: 'num_voucher',
-            buscar: ''
+            buscar: '',
+            arrayArticle: [],
+            idarticle: 0,
+            code: '',
+            article: '',
+            price: 0,
+            quantity: 0
         };
     },
 
@@ -48603,12 +48609,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             if (!this.pagination.to) {
                 return [];
             }
-
             var from = this.pagination.current_page - this.offset;
             if (from < 1) {
                 from = 1;
             }
-
             var to = from + this.offset * 2;
             if (to >= this.pagination.last_page) {
                 to = this.pagination.last_page;
@@ -48652,6 +48656,25 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             var me = this;
             me.loading = true;
             me.idsupplier = val1.id;
+        },
+        buscarArticulo: function buscarArticulo() {
+            var _this = this;
+
+            var url = '/article/buscarArticulo?filter=' + this.code;
+
+            axios.get(url).then(function (response) {
+                _this.arrayArticle = response.data.articles;
+
+                if (_this.arrayArticle.length > 0) {
+                    _this.article = _this.arrayArticle[0]['name'];
+                    _this.idarticle = _this.arrayArticle[0]['id'];
+                } else {
+                    _this.article = 'No existe artículo';
+                    _this.idarticle = 0;
+                }
+            }).catch(function (error) {
+                console.log(error);
+            });
         },
         changePage: function changePage(page, buscar, criterion) {
             var me = this;
@@ -48786,7 +48809,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             }
         },
         deactivateUser: function deactivateUser(id) {
-            var _this = this;
+            var _this2 = this;
 
             swal({
                 title: 'Esta seguro de desactivar esta Usuario?',
@@ -48802,7 +48825,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 reverseButtons: true
             }).then(function (result) {
                 if (result.value) {
-                    var me = _this;
+                    var me = _this2;
 
                     axios.put('/user/deactivate', {
                         'id': id
@@ -48818,7 +48841,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             });
         },
         activateUser: function activateUser(id) {
-            var _this2 = this;
+            var _this3 = this;
 
             swal({
                 title: 'Esta seguro de activar este Usuario?',
@@ -48834,7 +48857,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 reverseButtons: true
             }).then(function (result) {
                 if (result.value) {
-                    var me = _this2;
+                    var me = _this3;
 
                     axios.put('/user/activate', {
                         'id': id
@@ -49396,8 +49419,8 @@ var render = function() {
                               {
                                 name: "model",
                                 rawName: "v-model",
-                                value: _vm.idarticle,
-                                expression: "idarticle"
+                                value: _vm.code,
+                                expression: "code"
                               }
                             ],
                             staticClass: "form-control",
@@ -49405,20 +49428,57 @@ var render = function() {
                               type: "text",
                               placeholder: "Ingrese artículo"
                             },
-                            domProps: { value: _vm.idarticle },
+                            domProps: { value: _vm.code },
                             on: {
+                              keyup: function($event) {
+                                if (
+                                  !$event.type.indexOf("key") &&
+                                  _vm._k(
+                                    $event.keyCode,
+                                    "enter",
+                                    13,
+                                    $event.key,
+                                    "Enter"
+                                  )
+                                ) {
+                                  return null
+                                }
+                                return _vm.buscarArticulo()
+                              },
                               input: function($event) {
                                 if ($event.target.composing) {
                                   return
                                 }
-                                _vm.idarticle = $event.target.value
+                                _vm.code = $event.target.value
                               }
                             }
                           }),
                           _vm._v(" "),
                           _c("button", { staticClass: "btn btn-primary" }, [
                             _vm._v("...")
-                          ])
+                          ]),
+                          _vm._v(" "),
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.article,
+                                expression: "article"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            attrs: { type: "text", readonly: "" },
+                            domProps: { value: _vm.article },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.article = $event.target.value
+                              }
+                            }
+                          })
                         ])
                       ])
                     ]),

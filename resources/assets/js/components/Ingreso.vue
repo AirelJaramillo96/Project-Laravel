@@ -143,8 +143,9 @@
                                 <div class="form-group">
                                     <label>Artículo</label>
                                     <div class="form-inline">
-                                        <input type="text" class="form-control" v-model="idarticle" placeholder="Ingrese artículo">
+                                        <input type="text" class="form-control" v-model="code" @keyup.enter="buscarArticulo()" placeholder="Ingrese artículo">
                                         <button class="btn btn-primary">...</button>
+                                        <input type="text" readonly class="form-control" v-model="article">
                                     </div>                                    
                                 </div>
                             </div>
@@ -298,7 +299,6 @@
                arraySupplier : [],
                arrayDetalle : [],
                listado: 1,
-               
                modal: 0,
                tittlemodal : '',
                typeAction : 0,
@@ -314,7 +314,13 @@
                },
                offset : 3,
                criterion : 'num_voucher',
-               buscar : ''
+               buscar : '',
+               arrayArticle : [],
+               idarticle : 0,
+               code : '',
+               article :  '',
+               price : 0,
+               quantity: 0
            } 
         },
         components:{
@@ -328,12 +334,10 @@
                 if(!this.pagination.to) {
                     return [];
                 }
-                
                 var from = this.pagination.current_page - this.offset; 
                 if(from < 1) {
                     from = 1;
                 }
-
                 var to = from + (this.offset * 2); 
                 if(to >= this.pagination.last_page){
                     to = this.pagination.last_page;
@@ -379,6 +383,26 @@
                 let me = this;
                 me.loading = true;
                 me.idsupplier = val1.id;
+            },
+            buscarArticulo(){
+                var url= '/article/buscarArticulo?filter=' + this.code;
+
+                axios.get(url).then(response => {
+                    this.arrayArticle = response.data.articles;
+
+                    if (this.arrayArticle.length > 0 ){
+                        this.article = this.arrayArticle[0]['name'];
+                        this.idarticle = this.arrayArticle[0]['id'];
+                    }
+
+                    else{
+                        this.article = 'No existe artículo';
+                        this.idarticle = 0;
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
             },
             changePage (page, buscar, criterion){
                 let me = this;
