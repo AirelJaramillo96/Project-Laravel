@@ -62,12 +62,12 @@
                                         </td>
                                         <td v-text="venta.user"></td>
                                         <td v-text="venta.name"></td>
-                                        <td v-text="venta.tipo_comprobante"></td>
-                                        <td v-text="venta.serie_comprobante"></td>
-                                        <td v-text="venta.num_comprobante"></td>
+                                        <td v-text="venta.type_voucher"></td>
+                                        <td v-text="venta.serie_voucher"></td>
+                                        <td v-text="venta.num_voucher"></td>
                                         <td v-text="venta.fecha_hora"></td>
                                         <td v-text="venta.total"></td>
-                                        <td v-text="venta.impuesto"></td>
+                                        <td v-text="venta.tax"></td>
                                         <td v-text="venta.estado"></td>
                                     </tr>
                                 </tbody>
@@ -116,7 +116,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Tipo Comprobante(*)</label>
-                                    <select class="form-control" v-model="tipo_comprobante">
+                                    <select class="form-control" v-model="type_voucher">
                                         <option value="0">Seleccione</option>
                                         <option value="BOLETA">BOLETA</option>
                                         <option value="FACTURA">FACTURA</option>
@@ -127,13 +127,13 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Serie Comprobante</label>
-                                    <input type="text" class="form-control" v-model="serie_comprobante" placeholder="000x">
+                                    <input type="text" class="form-control" v-model="serie_voucher" placeholder="000x">
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Número Comprobante(*)</label>
-                                    <input type="text" class="form-control" v-model="num_comprobante" placeholder="000xx">
+                                    <input type="text" class="form-control" v-model="num_voucher" placeholder="000xx">
                                 </div>
                             </div>
                             <div class="col-md-12">
@@ -268,8 +268,8 @@
                         <div class="form-group row border">
                             <div class="col-md-9">
                                 <div class="form-group">
-                                    <label for="">Proveedor</label>
-                                    <p v-text="supplier"></p>
+                                    <label for="">cliente</label>
+                                    <p v-text="cliente"></p>
                                 </div>
                             </div>
                             <div class="col-md-3">
@@ -279,19 +279,19 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Tipo Comprobante</label>
-                                    <p v-text="tipo_comprobante"></p>
+                                    <p v-text="type_voucher"></p>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Serie Comprobante</label>
-                                    <p v-text="serie_comprobante"></p>
+                                    <p v-text="serie_voucher"></p>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Número Comprobante</label>
-                                    <p v-text="num_comprobante"></p>
+                                    <p v-text="num_voucher"></p>
                                 </div>
                             </div>
                            
@@ -306,44 +306,48 @@
                                             <th>Artículo</th>
                                             <th>Precio</th>
                                             <th>Cantidad</th>
+                                            <th>Descuento</th>
                                             <th>Subtotal</th>
                                         </tr>
                                     </thead>
                                     <tbody v-if="arrayDetalle.length">
                                         <tr v-for="(detalle) in arrayDetalle" :key="detalle.id">
                                            
-                                            <td v-text="detalle.article">
+                                            <td v-text="detalle.articulo">
                                                 <!--Nombre articulo-->
                                                
                                             </td>
-                                            <td v-text="detalle.price">
+                                            <td v-text="detalle.precio">
                                                 <!--input para el ingreso-->
                                             </td>
-                                            <td v-text="detalle.quantity">  
+                                            <td v-text="detalle.cantidad">  
+                                                <!--Valor del ingreso-->
+                                            </td>
+                                            <td v-text="detalle.descuento">  
                                                 <!--Valor del ingreso-->
                                             </td>
                                             <td>
                                                 <!--Subtotal-->
-                                                {{detalle.price*detalle.quantity}}
+                                                {{detalle.precio*detalle.cantidad-detalle.descuento}}
                                             </td>
                                         </tr>
                                         
                                         <tr style="background-color: #CEECF5;">
-                                            <td colspan="3" align="right"><strong>Total Parcial:</strong></td>
+                                            <td colspan="4" align="right"><strong>Total Parcial:</strong></td>
                                             <td> {{totalPartial=(total-totalTax).toFixed(2)}}</td>
                                         </tr>
                                         <tr style="background-color: #CEECF5;">
-                                            <td colspan="3" align="right"><strong>Total Impuesto:</strong></td>
+                                            <td colspan="4" align="right"><strong>Total Impuesto:</strong></td>
                                             <td> {{totalTax=((total*tax)).toFixed(2)}}</td>
                                         </tr>
                                         <tr style="background-color: #CEECF5;">
-                                            <td colspan="3" align="right"><strong>Total Neto:</strong></td>
+                                            <td colspan="4" align="right"><strong>Total Neto:</strong></td>
                                             <td> {{total}}</td>
                                         </tr>
                                     </tbody> 
                                     <tbody v-else>
                                         <tr>
-                                            <td colspan="4">
+                                            <td colspan="5">
                                                 No hay articulos agregados
                                             </td>
                                         </tr>
@@ -456,10 +460,10 @@
                venta_id : 0,
                idcliente :'',
                cliente : '',
-               tipo_comprobante : 'BOLETA',
-               serie_comprobante : '',
-               num_comprobante : '',
-               impuesto : 0.18,
+               type_voucher : 'BOLETA',
+               serie_voucher : '',
+               num_voucher : '',
+               tax : 0.18,
                total : 0.0,
                totalTax : 0.0,
                totalPartial : 0.0,
@@ -489,6 +493,7 @@
                idarticle : 0,
                code : '',
                article :  '',
+
                price : 0,
                quantity: 0,
                descuento: 0,
@@ -691,7 +696,7 @@
                 }
                 let me = this;
 
-                axios.post('/venta/register',{
+                axios.post('/venta/registrar',{
                     'idcliente': this.idcliente,
                     'tipo_comprobante': this.type_voucher,
                     'serie_comprobante' : this.serie_voucher,
@@ -790,28 +795,28 @@
             hideDetail(){
                 this.listado=1;
             },
-            verIngreso(id){
+            verVenta(id){
                 let me=this;
                 this.listado =2;
                 //Obtener los datos del ingreso
-                var arrayIngresoT=[];
-                var url= '/ingreso/obtenerCabecera?id=' + id;
+                var arrayVentaT=[];
+                var url= '/venta/obtenerCabecera?id=' + id;
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
-                    arrayIngresoT = respuesta.ingreso;
-                    me.supplier = arrayIngresoT[0]['name'];
-                    me.type_voucher = arrayIngresoT[0]['type_voucher'];
-                    me.serie_voucher = arrayIngresoT[0]['serie_voucher'];
-                    me.num_voucher = arrayIngresoT[0]['num_voucher'];
-                    me.tax = arrayIngresoT[0]['tax'];
-                    me.total = arrayIngresoT[0]['total'];
+                    arrayVentaT = respuesta.venta;
+                    me.cliente = arrayVentaT[0]['name'];
+                    me.type_voucher = arrayVentaT[0]['tipo_comprobante'];
+                    me.serie_voucher = arrayVentaT[0]['serie_comprobante'];
+                    me.num_voucher = arrayVentaT[0]['num_comprobante'];
+                    me.tax = arrayVentaT[0]['impuesto'];
+                    me.total = arrayVentaT[0]['total'];
                 })
                 .catch(function (error) {
                     console.log(error);
                 });
 
                 //Obtener los datos de los detalles 
-               var urld= '/ingreso/obtenerDetalles?id=' + id;
+               var urld= '/venta/obtenerDetalles?id=' + id;
                 axios.get(urld).then(function (response) {
                     var respuesta= response.data;
                     me.arrayDetalle = respuesta.detalles;
@@ -832,9 +837,9 @@
                 this.tittlemodal = 'Seleccionar Articulo';
                                   
             },
-            deactivateIngreso(id){
+            deactivateVenta(id){
                  swal({
-                title: 'Esta seguro de anular este ingreso?',
+                title: 'Esta seguro de anular esta venta?',
                 type: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -849,13 +854,13 @@
                 if (result.value) {
                     let me = this;
 
-                    axios.put('/ingreso/deactivate',{
+                    axios.put('/venta/desactivar',{
                         'id': id
                     }).then(function (response) {
-                        me.listIngreso(1,'','num_voucher');
+                        me.listVenta(1,'','num_voucher');
                         swal(
                         'Anulado!',
-                        'El ingreso ha sido anulado con éxito.',
+                        'La venta ha sido anulada con éxito.',
                         'success'
                         )
                     }).catch(function (error) {
