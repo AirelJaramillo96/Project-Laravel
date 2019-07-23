@@ -24,6 +24,7 @@ window.Vue = require('vue');
  Vue.component('user-component', require('./components/User.vue'));
  Vue.component('ingreso-component', require('./components/Ingreso.vue'));
  Vue.component('venta-component', require('./components/Venta.vue'));
+ Vue.component('dashboard-component', require('./components/Dashboard.vue'));
  const app = new Vue({
     el: '#app',
     data :{
