@@ -71,17 +71,18 @@ class ArticleController extends Controller
         if (!$request->ajax()) return redirect('/');
  
         $buscar = $request->buscar;
-        $criterio = $request->criterio;
+        $criterion = $request->criterion;
          
         if ($buscar == ''){
             $articles = Article::join('categories','articles.idcategory','=','categories.id')
             ->select('articles.id','articles.idcategory','articles.code','articles.name','categories.name as name_category', 'articles.price_vent','articles.stock','articles.description','articles.condition')
+            ->where('articles.stock','>','0')
             ->orderBy('articles.id', 'desc')->paginate(10);
         }
         else{
             $articles = Article::join('categories','articles.idcategory','=','categories.id')
             ->select('articles.id','articles.idcategory','articles.code','articles.name','categories.name as name_category', 'articles.price_vent','articles.stock','articles.description','articles.condition')
-            ->where('articles.'.$criterio, 'like', '%'. $buscar . '%')
+            ->where('articles.'.$criterion, 'like', '%'. $buscar . '%')
             ->where('articles.stock','>','0')
             ->orderBy('articles.id', 'desc')->paginate(10);
 

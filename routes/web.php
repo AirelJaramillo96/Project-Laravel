@@ -60,6 +60,10 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('/client/update','ClienteController@update');
         Route::get('/client/selectCliente','ClienteController@selectCliente');
 
+        
+        Route::get('/article/buscarArticuloVenta','ArticleController@buscarArticuloVenta');
+        Route::get('/article/listarArticuloVenta','ArticleController@listarArticuloVenta');
+
         Route::get('/venta', 'VentaController@index');
         Route::post('/venta/registrar', 'VentaController@store');
         Route::put('/venta/desactivar', 'VentaController@desactivar');

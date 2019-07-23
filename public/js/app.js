@@ -51275,13 +51275,28 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     data: function data() {
         return {
             venta_id: 0,
-            idlciente: '',
+            idcliente: '',
             cliente: '',
             tipo_comprobante: 'BOLETA',
             serie_comprobante: '',
@@ -51308,7 +51323,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 'to': 0
             },
             offset: 3,
-            criterion: 'num_voucher',
+            criterion: 'num_comprobante',
             buscar: '',
             criterionA: 'name',
             buscarA: '',
@@ -51317,7 +51332,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             code: '',
             article: '',
             price: 0,
-            quantity: 0
+            quantity: 0,
+            descuento: 0,
+            stock: 0
         };
     },
 
@@ -51351,7 +51368,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         calcularTotal: function calcularTotal() {
             var resultado = 0.0;
             for (var i = 0; i < this.arrayDetalle.length; i++) {
-                resultado = resultado + this.arrayDetalle[i].price * this.arrayDetalle[i].quantity;
+                resultado = resultado + (this.arrayDetalle[i].price * this.arrayDetalle[i].quantity - this.arrayDetalle[i].descuento);
             }
             return resultado;
         }
@@ -51368,39 +51385,41 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 console.log(error);
             });
         },
-        selectSupplier: function selectSupplier(search, loading) {
+        selectCliente: function selectCliente(search, loading) {
             var me = this;
             loading(true);
 
-            var url = '/supplier/selectSupplier?filter=' + search;
+            var url = '/client/selectCliente?filter=' + search;
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
                 q: search;
-                me.arraySupplier = respuesta.suppliers;
+                me.arrayCliente = respuesta.clientes;
                 loading(false);
             }).catch(function (error) {
                 console.log(error);
             });
         },
-        getDataSupplier: function getDataSupplier(val1) {
+        getDataCliente: function getDataCliente(val1) {
             var me = this;
             me.loading = true;
-            me.idsupplier = val1.id;
+            me.idcliente = val1.id;
         },
         buscarArticulo: function buscarArticulo() {
-            var _this = this;
-
-            var url = '/article/buscarArticulo?filter=' + this.code;
+            var me = this;
+            var url = '/article/buscarArticuloVenta?filtro=' + me.code;
 
             axios.get(url).then(function (response) {
-                _this.arrayArticle = response.data.articles;
+                var respuesta = response.data;
+                me.arrayArticle = respuesta.articulos;
 
-                if (_this.arrayArticle.length > 0) {
-                    _this.article = _this.arrayArticle[0]['name'];
-                    _this.idarticle = _this.arrayArticle[0]['id'];
+                if (me.arrayArticle.length > 0) {
+                    me.article = me.arrayArticle[0]['name'];
+                    me.idarticle = me.arrayArticle[0]['id'];
+                    me.price = me.arrayArticle[0]['price_vent'];
+                    me.stock = me.arrayArticle[0]['stock'];
                 } else {
-                    _this.article = 'No existe artículo';
-                    _this.idarticle = 0;
+                    me.article = 'No existe artículo';
+                    me.idarticle = 0;
                 }
             }).catch(function (error) {
                 console.log(error);
@@ -51436,17 +51455,29 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                         text: 'Ese artículo ya se encuentra agregado!'
                     });
                 } else {
-                    me.arrayDetalle.push({
-                        idarticle: me.idarticle,
-                        article: me.article,
-                        quantity: me.quantity,
-                        price: me.price
-                    });
-                    me.code = "";
-                    me.idarticle = 0;
-                    me.article = "";
-                    me.quantity = 0;
-                    me.price = 0;
+                    if (me.quantity > me.stock) {
+                        swal({
+                            type: 'error',
+                            title: 'Error...',
+                            text: 'No hay stock'
+                        });
+                    } else {
+                        me.arrayDetalle.push({
+                            idarticle: me.idarticle,
+                            article: me.article,
+                            quantity: me.quantity,
+                            price: me.price,
+                            descuento: me.descuento,
+                            stock: me.stock
+                        });
+                        me.code = "";
+                        me.idarticle = 0;
+                        me.article = "";
+                        me.quantity = 0;
+                        me.price = 0;
+                        me.descuento = 0;
+                        me.stock;
+                    }
                 }
             }
         },
@@ -51466,13 +51497,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                     idarticle: data['id'],
                     article: data['name'],
                     quantity: 1,
-                    price: 1
+                    price: data['price_vent'],
+                    descuento: 0,
+                    stock: data['stock']
                 });
             }
         },
         listArticle: function listArticle(buscar, criterion) {
             var me = this;
-            var url = '/article/listarArticulo?buscar=' + buscar + '&criterion=' + criterion;
+            var url = '/article/listarArticuloVenta?buscar=' + buscar + '&criterion=' + criterion;
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
                 me.arrayArticle = respuesta.articles.data;
@@ -51483,25 +51516,25 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 console.log(error);
             });
         },
-        registrarIngreso: function registrarIngreso() {
-            if (this.valideEntry()) {
+        registrarVenta: function registrarVenta() {
+            if (this.valideVenta()) {
                 return;
             }
             var me = this;
 
-            axios.post('/ingreso/register', {
-                'idsupplier': this.idsupplier,
-                'type_voucher': this.type_voucher,
-                'serie_voucher': this.serie_voucher,
-                'num_voucher': this.num_voucher,
-                'tax': this.tax,
+            axios.post('/venta/register', {
+                'idcliente': this.idcliente,
+                'tipo_comprobante': this.type_voucher,
+                'serie_comprobante': this.serie_voucher,
+                'num_comprobante': this.num_voucher,
+                'impuesto': this.tax,
                 'total': this.total,
                 'data': this.arrayDetalle
 
             }).then(function (response) {
                 me.listado = 1;
-                me.listIngreso(1, '', 'num_voucher');
-                me.idproveedor = 0;
+                me.listVenta(1, '', 'num_voucher');
+                me.idcliente = 0;
                 me.type_voucher = 'BOLETA';
                 me.serie_voucher = '';
                 me.num_voucher = '';
@@ -51511,6 +51544,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 me.article = '';
                 me.quantity = 0;
                 me.price = 0;
+                me.stock = 0;
+                me.code = '';
+                me.descuento = 0;
                 me.arrayDetalle = [];
             }).catch(function (error) {
                 console.log(error);
@@ -51540,19 +51576,29 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 console.log(error);
             });
         },
-        valideEntry: function valideEntry() {
-            this.errorEntry = 0;
-            this.errorShowMsjEntry = [];
+        valideVenta: function valideVenta() {
+            var me = this;
 
-            if (this.idsupplier == 0) this.errorShowMsjEntry.push("Seleccione un Proveedor");
-            if (this.type_voucher == 0) this.errorShowMsjEntry.push("Seleccione el comprobante");
-            if (!this.num_voucher) this.errorShowMsjEntry.push("Ingrese el número de comprobante");
-            if (!this.tax) this.errorShowMsjEntry.push("Ingrese el impuesto de compra");
-            if (this.arrayDetalle.length <= 0) this.errorShowMsjEntry.push("Ingrese detalles");
+            me.errorVenta = 0;
+            me.errorShowMsjVenta = [];
+            var art;
 
-            if (this.errorShowMsjEntry.length) this.errorEntry = 1;
+            me.arrayDetalle.map(function (x) {
+                if (x.quantity > x.stock) {
+                    art = x.article + " con stock insuficiente";
+                    me.errorShowMsjVenta.push(art);
+                }
+            });
 
-            return this.errorEntry;
+            if (me.idcliente == 0) me.errorShowMsjVenta.push("Seleccione un Proveedor");
+            if (me.type_voucher == 0) me.errorShowMsjVenta.push("Seleccione el comprobante");
+            if (!me.num_voucher) me.errorShowMsjVenta.push("Ingrese el número de comprobante");
+            if (!me.tax) me.errorShowMsjVenta.push("Ingrese el impuesto de compra");
+            if (me.arrayDetalle.length <= 0) me.errorShowMsjVenta.push("Ingrese detalles");
+
+            if (me.errorShowMsjVenta.length) me.errorVenta = 1;
+
+            return me.errorVenta;
         },
         showDetail: function showDetail() {
             var me = this;
@@ -51611,7 +51657,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.tittlemodal = 'Seleccionar Articulo';
         },
         deactivateIngreso: function deactivateIngreso(id) {
-            var _this2 = this;
+            var _this = this;
 
             swal({
                 title: 'Esta seguro de anular este ingreso?',
@@ -51627,7 +51673,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 reverseButtons: true
             }).then(function (result) {
                 if (result.value) {
-                    var me = _this2;
+                    var me = _this;
 
                     axios.put('/ingreso/deactivate', {
                         'id': id
@@ -51721,15 +51767,19 @@ var render = function() {
                             }
                           },
                           [
-                            _c("option", { attrs: { value: "type_voucher" } }, [
-                              _vm._v("Tipo Comprobante")
-                            ]),
+                            _c(
+                              "option",
+                              { attrs: { value: "tipo_comprobante" } },
+                              [_vm._v("Tipo Comprobante")]
+                            ),
                             _vm._v(" "),
-                            _c("option", { attrs: { value: "num_voucher" } }, [
-                              _vm._v("Numero Comprobante")
-                            ]),
+                            _c(
+                              "option",
+                              { attrs: { value: "num_comprobante" } },
+                              [_vm._v("Numero Comprobante")]
+                            ),
                             _vm._v(" "),
-                            _c("option", { attrs: { value: "date_hour" } }, [
+                            _c("option", { attrs: { value: "fecha_hora" } }, [
                               _vm._v("fecha-hora")
                             ])
                           ]
@@ -52007,18 +52057,18 @@ var render = function() {
                         { staticClass: "form-group" },
                         [
                           _c("label", { attrs: { for: "" } }, [
-                            _vm._v("Proveedor(*)")
+                            _vm._v("Cliente(*)")
                           ]),
                           _vm._v(" "),
                           _c(
                             "v-select",
                             {
                               attrs: {
-                                "on-search": _vm.selectSupplier,
+                                "on-search": _vm.selectCliente,
                                 label: "name",
-                                options: _vm.arraySupplier,
-                                placeholder: "Buscar Proveedores...",
-                                onChange: _vm.getDataSupplier
+                                options: _vm.arrayCliente,
+                                placeholder: "Buscar Clientes...",
+                                onChange: _vm.getDataCliente
                               }
                             },
                             [
@@ -52074,8 +52124,8 @@ var render = function() {
                               {
                                 name: "model",
                                 rawName: "v-model",
-                                value: _vm.type_voucher,
-                                expression: "type_voucher"
+                                value: _vm.tipo_comprobante,
+                                expression: "tipo_comprobante"
                               }
                             ],
                             staticClass: "form-control",
@@ -52089,7 +52139,7 @@ var render = function() {
                                     var val = "_value" in o ? o._value : o.value
                                     return val
                                   })
-                                _vm.type_voucher = $event.target.multiple
+                                _vm.tipo_comprobante = $event.target.multiple
                                   ? $$selectedVal
                                   : $$selectedVal[0]
                               }
@@ -52125,19 +52175,19 @@ var render = function() {
                             {
                               name: "model",
                               rawName: "v-model",
-                              value: _vm.serie_voucher,
-                              expression: "serie_voucher"
+                              value: _vm.serie_comprobante,
+                              expression: "serie_comprobante"
                             }
                           ],
                           staticClass: "form-control",
                           attrs: { type: "text", placeholder: "000x" },
-                          domProps: { value: _vm.serie_voucher },
+                          domProps: { value: _vm.serie_comprobante },
                           on: {
                             input: function($event) {
                               if ($event.target.composing) {
                                 return
                               }
-                              _vm.serie_voucher = $event.target.value
+                              _vm.serie_comprobante = $event.target.value
                             }
                           }
                         })
@@ -52153,19 +52203,19 @@ var render = function() {
                             {
                               name: "model",
                               rawName: "v-model",
-                              value: _vm.num_voucher,
-                              expression: "num_voucher"
+                              value: _vm.num_comprobante,
+                              expression: "num_comprobante"
                             }
                           ],
                           staticClass: "form-control",
                           attrs: { type: "text", placeholder: "000xx" },
-                          domProps: { value: _vm.num_voucher },
+                          domProps: { value: _vm.num_comprobante },
                           on: {
                             input: function($event) {
                               if ($event.target.composing) {
                                 return
                               }
-                              _vm.num_voucher = $event.target.value
+                              _vm.num_comprobante = $event.target.value
                             }
                           }
                         })
@@ -52180,8 +52230,8 @@ var render = function() {
                             {
                               name: "show",
                               rawName: "v-show",
-                              value: _vm.errorEntry,
-                              expression: "errorEntry"
+                              value: _vm.errorVenta,
+                              expression: "errorVenta"
                             }
                           ],
                           staticClass: "form-group row div-error"
@@ -52190,7 +52240,7 @@ var render = function() {
                           _c(
                             "div",
                             { staticClass: "text-center text-error" },
-                            _vm._l(_vm.errorShowMsjEntry, function(error) {
+                            _vm._l(_vm.errorShowMsjVenta, function(error) {
                               return _c("div", {
                                 key: error,
                                 domProps: { textContent: _vm._s(error) }
@@ -52204,7 +52254,7 @@ var render = function() {
                   ]),
                   _vm._v(" "),
                   _c("div", { staticClass: "form-group row border" }, [
-                    _c("div", { staticClass: "col-md-6" }, [
+                    _c("div", { staticClass: "col-md-4" }, [
                       _c("div", { staticClass: "form-group" }, [
                         _c("label", [
                           _vm._v("Artículo"),
@@ -52396,6 +52446,34 @@ var render = function() {
                     _vm._v(" "),
                     _c("div", { staticClass: "col-md-2" }, [
                       _c("div", { staticClass: "form-group" }, [
+                        _c("label", [_vm._v("Descuento>(*Ingrese Cantidad)")]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.descuento,
+                              expression: "descuento"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          attrs: { type: "number", value: "0" },
+                          domProps: { value: _vm.descuento },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.descuento = $event.target.value
+                            }
+                          }
+                        })
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-md-2" }, [
+                      _c("div", { staticClass: "form-group" }, [
                         _c(
                           "button",
                           {
@@ -52473,7 +52551,7 @@ var render = function() {
                                             }
                                           ],
                                           staticClass: "form-control",
-                                          attrs: { type: "number", value: "3" },
+                                          attrs: { type: "number" },
                                           domProps: { value: detalle.price },
                                           on: {
                                             input: function($event) {
@@ -52491,6 +52569,30 @@ var render = function() {
                                       ]),
                                       _vm._v(" "),
                                       _c("td", [
+                                        _c(
+                                          "span",
+                                          {
+                                            directives: [
+                                              {
+                                                name: "show",
+                                                rawName: "v-show",
+                                                value:
+                                                  detalle.quantity >
+                                                  detalle.stock,
+                                                expression:
+                                                  "detalle.quantity>detalle.stock"
+                                              }
+                                            ],
+                                            staticStyle: { color: "red" }
+                                          },
+                                          [
+                                            _vm._v(
+                                              "Stock:\n                                                     " +
+                                                _vm._s(detalle.stock)
+                                            )
+                                          ]
+                                        ),
+                                        _vm._v(" "),
                                         _c("input", {
                                           directives: [
                                             {
@@ -52501,7 +52603,7 @@ var render = function() {
                                             }
                                           ],
                                           staticClass: "form-control",
-                                          attrs: { type: "number", value: "2" },
+                                          attrs: { type: "number" },
                                           domProps: { value: detalle.quantity },
                                           on: {
                                             input: function($event) {
@@ -52519,10 +52621,61 @@ var render = function() {
                                       ]),
                                       _vm._v(" "),
                                       _c("td", [
+                                        _c(
+                                          "span",
+                                          {
+                                            directives: [
+                                              {
+                                                name: "show",
+                                                rawName: "v-show",
+                                                value:
+                                                  detalle.descuento >
+                                                  detalle.price *
+                                                    detalle.quantity,
+                                                expression:
+                                                  "detalle.descuento>(detalle.price*detalle.quantity)"
+                                              }
+                                            ],
+                                            staticStyle: { color: "red" }
+                                          },
+                                          [_vm._v("Descuento superior")]
+                                        ),
+                                        _vm._v(" "),
+                                        _c("input", {
+                                          directives: [
+                                            {
+                                              name: "model",
+                                              rawName: "v-model",
+                                              value: detalle.descuento,
+                                              expression: "detalle.descuento"
+                                            }
+                                          ],
+                                          staticClass: "form-control",
+                                          attrs: { type: "number" },
+                                          domProps: {
+                                            value: detalle.descuento
+                                          },
+                                          on: {
+                                            input: function($event) {
+                                              if ($event.target.composing) {
+                                                return
+                                              }
+                                              _vm.$set(
+                                                detalle,
+                                                "descuento",
+                                                $event.target.value
+                                              )
+                                            }
+                                          }
+                                        })
+                                      ]),
+                                      _vm._v(" "),
+                                      _c("td", [
                                         _vm._v(
-                                          "\n                                                " +
+                                          "\n\n                                                " +
                                             _vm._s(
-                                              detalle.price * detalle.quantity
+                                              detalle.price * detalle.quantity -
+                                                detalle.descuento
                                             ) +
                                             "\n                                            "
                                         )
@@ -52629,11 +52782,11 @@ var render = function() {
                           attrs: { type: "button" },
                           on: {
                             click: function($event) {
-                              return _vm.registrarIngreso()
+                              return _vm.registrarVenta()
                             }
                           }
                         },
-                        [_vm._v("Registrar Compra")]
+                        [_vm._v("Registrar Venta")]
                       )
                     ])
                   ])
@@ -52666,7 +52819,9 @@ var render = function() {
                         _c("label", [_vm._v("Tipo Comprobante")]),
                         _vm._v(" "),
                         _c("p", {
-                          domProps: { textContent: _vm._s(_vm.type_voucher) }
+                          domProps: {
+                            textContent: _vm._s(_vm.tipo_comprobante)
+                          }
                         })
                       ])
                     ]),
@@ -52676,7 +52831,9 @@ var render = function() {
                         _c("label", [_vm._v("Serie Comprobante")]),
                         _vm._v(" "),
                         _c("p", {
-                          domProps: { textContent: _vm._s(_vm.serie_voucher) }
+                          domProps: {
+                            textContent: _vm._s(_vm.serie_comprobante)
+                          }
                         })
                       ])
                     ]),
@@ -52686,7 +52843,7 @@ var render = function() {
                         _c("label", [_vm._v("Número Comprobante")]),
                         _vm._v(" "),
                         _c("p", {
-                          domProps: { textContent: _vm._s(_vm.num_voucher) }
+                          domProps: { textContent: _vm._s(_vm.num_comprobante) }
                         })
                       ])
                     ])
@@ -53174,6 +53331,8 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", [_vm._v("Cantidad")]),
         _vm._v(" "),
+        _c("th", [_vm._v("Descuento")]),
+        _vm._v(" "),
         _c("th", [_vm._v("Subtotal")])
       ])
     ])
@@ -53207,7 +53366,7 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("tr", [
-      _c("td", { attrs: { colspan: "5" } }, [
+      _c("td", { attrs: { colspan: "6" } }, [
         _vm._v(
           "\n                                                No hay articulos agregados\n                                            "
         )
