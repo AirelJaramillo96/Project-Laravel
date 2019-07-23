@@ -66,6 +66,30 @@ class ArticleController extends Controller
 
     }
 
+    public function listarArticuloVenta(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+ 
+        $buscar = $request->buscar;
+        $criterio = $request->criterio;
+         
+        if ($buscar == ''){
+            $articles = Article::join('categories','articles.idcategory','=','categories.id')
+            ->select('articles.id','articles.idcategory','articles.code','articles.name','categories.name as name_category', 'articles.price_vent','articles.stock','articles.description','articles.condition')
+            ->orderBy('articles.id', 'desc')->paginate(10);
+        }
+        else{
+            $articles = Article::join('categories','articles.idcategory','=','categories.id')
+            ->select('articles.id','articles.idcategory','articles.code','articles.name','categories.name as name_category', 'articles.price_vent','articles.stock','articles.description','articles.condition')
+            ->where('articles.'.$criterio, 'like', '%'. $buscar . '%')
+            ->where('articles.stock','>','0')
+            ->orderBy('articles.id', 'desc')->paginate(10);
+
+        }
+      
+            return ['articles' => $articles];
+
+    }
 
 
 
@@ -79,6 +103,18 @@ class ArticleController extends Controller
         return ['articles' => $articles];
     }
     
+    public function buscarArticuloVenta(Request $request){
+        if (!$request->ajax()) return redirect('/');
+ 
+        $filtro = $request->filtro;
+        $articulos = Article::where('code','=', $filtro)
+        ->select('id','name','stock','price_vent')
+        ->where('stock','>','0')
+        ->orderBy('name', 'asc')
+        ->take(1)->get();
+ 
+        return ['articulos' => $articulos];
+    }
 
     public function store(Request $request)
     {

@@ -20,7 +20,7 @@
             <supplier-component></supplier-component>
         </template>
         <template v-if="menu==5">
-            <h1>Ventas</h1>
+            <venta-component></venta-componente>
         </template>
         <template v-if="menu==6">
             <client-component></client-component>
@@ -45,7 +45,7 @@
         </template>   
     @elseif (Auth::user()->idrol == 2)
         <template v-if="menu==5">
-            <h1>Ventas</h1>
+            <venta-component></venta-componente>
         </template>
         <template v-if="menu==6">
             <client-component></client-component>
