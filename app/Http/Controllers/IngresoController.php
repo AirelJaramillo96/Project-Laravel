@@ -46,6 +46,35 @@ class IngresoController extends Controller
             'ingresos' => $ingresos
         ];
     }
+    public function obtenerCabecera(Request $request){
+        if (!$request->ajax()) return redirect('/');
+ 
+        $id = $request->id;
+    
+            $ingreso = Ingreso::join('personas','ingresos.idsupplier','=','personas.id')
+            ->join('users','ingresos.iduser','=','users.id')
+            ->select('ingresos.id','ingresos.type_voucher','ingresos.serie_voucher',
+            'ingresos.num_voucher','ingresos.date_hour','ingresos.tax','ingresos.total',
+            'ingresos.state','personas.name','users.user')
+            ->where('ingresos.id','=',$id)
+            ->orderBy('ingresos.id', 'desc')->take(1)->get();
+        
+
+        return ['ingreso' => $ingreso];
+    }
+    public function obtenerDetalles(Request $request){
+        if (!$request->ajax()) return redirect('/');
+ 
+        $id = $request->id;
+    
+            $detalles = DetalleIngreso::join('articles','detalle_ingresos.idarticle','=','articles.id')
+            ->select('detalle_ingresos.quantity','detalle_ingresos.price','articles.name as article')
+            ->where('detalle_ingresos.identry','=',$id)
+            ->orderBy('detalle_ingresos.id', 'desc')->get();
+        
+
+        return ['detalles' => $detalles];
+    }
     public function store(Request $request)
     {
         if (!$request->ajax()) return redirect('/');

@@ -15,7 +15,7 @@
                         </button>
                     </div>
                     <!--Listado-->
-                    <template v-if="listado">
+                    <template v-if="listado==1">
                     <div class="card-body">
                         <div class="form-group row">
                             <div class="col-md-6">
@@ -50,7 +50,7 @@
                                 <tbody>
                                     <tr v-for="ingreso in arrayIngreso" :key="ingreso.id">
                                         <td>
-                                            <button type="button" @click="openModal('ingreso','update', ingreso)" class="btn btn-success btn-sm">
+                                            <button type="button" @click="verIngreso(ingreso.id)" class="btn btn-success btn-sm">
                                             <i class="icon-eye"></i>
                                             </button> &nbsp;
                                             <template v-if="ingreso.state=='Registrado'">
@@ -90,7 +90,7 @@
                     </template>
                     <!--Fin Listado-->
                     <!--Detalle-->
-                    <template v-else>
+                    <template v-else-if="listado==0">
                     <div class="card-body">
                         <div class="form-group row border">
                             <div class="col-md-9">
@@ -247,6 +247,104 @@
                     </div>
                     </template>
                     <!--Fin Detalle-->
+                    <!--Ver Ingresos-->
+                    <template v-else-if="listado==2">
+                    <div class="card-body">
+                        <div class="form-group row border">
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <label for="">Proveedor</label>
+                                    <p v-text="supplier"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                    <label for="">Impuesto</label>
+                                    <p v-text="tax"></p>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Tipo Comprobante</label>
+                                    <p v-text="type_voucher"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Serie Comprobante</label>
+                                    <p v-text="serie_voucher"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Número Comprobante</label>
+                                    <p v-text="num_voucher"></p>
+                                </div>
+                            </div>
+                           
+
+                        </div>
+                        
+                        <div class="form-group row">
+                            <div class="table-responsive col-md-12">
+                                <table class="table table-bordered table-striped table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Artículo</th>
+                                            <th>Precio</th>
+                                            <th>Cantidad</th>
+                                            <th>Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody v-if="arrayDetalle.length">
+                                        <tr v-for="(detalle) in arrayDetalle" :key="detalle.id">
+                                           
+                                            <td v-text="detalle.article">
+                                                <!--Nombre articulo-->
+                                               
+                                            </td>
+                                            <td v-text="detalle.price">
+                                                <!--input para el ingreso-->
+                                            </td>
+                                            <td v-text="detalle.quantity">  
+                                                <!--Valor del ingreso-->
+                                            </td>
+                                            <td>
+                                                <!--Subtotal-->
+                                                {{detalle.price*detalle.quantity}}
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr style="background-color: #CEECF5;">
+                                            <td colspan="3" align="right"><strong>Total Parcial:</strong></td>
+                                            <td> {{totalPartial=(total-totalTax).toFixed(2)}}</td>
+                                        </tr>
+                                        <tr style="background-color: #CEECF5;">
+                                            <td colspan="3" align="right"><strong>Total Impuesto:</strong></td>
+                                            <td> {{totalTax=((total*tax)).toFixed(2)}}</td>
+                                        </tr>
+                                        <tr style="background-color: #CEECF5;">
+                                            <td colspan="3" align="right"><strong>Total Neto:</strong></td>
+                                            <td> {{total}}</td>
+                                        </tr>
+                                    </tbody> 
+                                    <tbody v-else>
+                                        <tr>
+                                            <td colspan="4">
+                                                No hay articulos agregados
+                                            </td>
+                                        </tr>
+                                    </tbody>                                   
+                                </table>
+                            </div>
+
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-12">
+                                <button type="button" @click="hideDetail()" class="btn btn-secondary">Cerrar</button>
+                            </div>
+                        </div>
+                    </div>
+                    </template>
+                    <!--Fin ver Ingresos-->
                 </div>
                 <!-- Fin ejemplo de tabla Listado -->
             </div>
@@ -342,6 +440,7 @@
            return {
                ingreso_id : 0,
                idsupplier :'',
+               supplier : '',
                type_voucher : 'BOLETA',
                serie_voucher : '',
                num_voucher : '',
@@ -642,6 +741,37 @@
             hideDetail(){
                 this.listado=1;
             },
+            verIngreso(id){
+                let me=this;
+                this.listado =2;
+                //Obtener los datos del ingreso
+                var arrayIngresoT=[];
+                var url= '/ingreso/obtenerCabecera?id=' + id;
+                axios.get(url).then(function (response) {
+                    var respuesta= response.data;
+                    arrayIngresoT = respuesta.ingreso;
+                    me.supplier = arrayIngresoT[0]['name'];
+                    me.type_voucher = arrayIngresoT[0]['type_voucher'];
+                    me.serie_voucher = arrayIngresoT[0]['serie_voucher'];
+                    me.num_voucher = arrayIngresoT[0]['num_voucher'];
+                    me.tax = arrayIngresoT[0]['tax'];
+                    me.total = arrayIngresoT[0]['total'];
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+
+                //Obtener los datos de los detalles 
+               var urld= '/ingreso/obtenerDetalles?id=' + id;
+                axios.get(urld).then(function (response) {
+                    var respuesta= response.data;
+                    me.arrayDetalle = respuesta.detalles;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+  
+            },
             closeModal(){
                 this.modal =0;
                 this.tittlemodal='';
@@ -653,9 +783,9 @@
                 this.tittlemodal = 'Seleccionar Articulo';
                                   
             },
-            deactivateUser(id){
+            deactivateIngreso(id){
                  swal({
-                title: 'Esta seguro de desactivar esta Usuario?',
+                title: 'Esta seguro de anular este ingreso?',
                 type: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -670,13 +800,13 @@
                 if (result.value) {
                     let me = this;
 
-                    axios.put('/user/deactivate',{
+                    axios.put('/ingreso/deactivate',{
                         'id': id
                     }).then(function (response) {
-                        me.listPerson(1,'','name');
+                        me.listIngreso(1,'','num_voucher');
                         swal(
-                        'Desactivado!',
-                        'El registro ha sido desactivado con éxito.',
+                        'Anulado!',
+                        'El ingreso ha sido anulado con éxito.',
                         'success'
                         )
                     }).catch(function (error) {
@@ -690,43 +820,7 @@
                 }
                 })
             },
-            activateUser(id){
-                 swal({
-                title: 'Esta seguro de activar este Usuario?',
-                type: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Aceptar!',
-                cancelButtonText: 'Cancelar',
-                confirmButtonClass: 'btn btn-success',
-                cancelButtonClass: 'btn btn-danger',
-                buttonsStyling: false,
-                reverseButtons: true
-                }).then((result) => {
-                if (result.value) {
-                    let me = this;
-
-                    axios.put('/user/activate',{
-                        'id': id
-                    }).then(function (response) {
-                        me.listPerson(1,'','name');
-                        swal(
-                        'Activado!',
-                        'El registro ha sido desactivado con éxito.',
-                        'success'
-                        )
-                    }).catch(function (error) {
-                        console.log(error);
-                    });
-                } else if (
-                    // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
-                ) {
-                    
-                }
-                })
-            },
+            
         },
         mounted() {
             this.listIngreso(1, this.buscar, this.criterion);

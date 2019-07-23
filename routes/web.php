@@ -48,6 +48,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/ingreso','IngresoController@index');
         Route::post('/ingreso/register','IngresoController@store');
         Route::put('/ingreso/deactivate','IngresoController@deactivate');
+        Route::get('/ingreso/obtenerCabecera','IngresoController@obtenerCabecera');
+        Route::get('/ingreso/obtenerDetalles','IngresoController@obtenerDetalles');
     });
 
         Route::group(['middleware' => ['Vendedor']], function () {
@@ -81,6 +83,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/ingreso','IngresoController@index');
         Route::post('/ingreso/register','IngresoController@store');
         Route::put('/ingreso/deactivate','IngresoController@deactivate');
+        Route::get('/ingreso/obtenerCabecera','IngresoController@obtenerCabecera');
+        Route::get('/ingreso/obtenerDetalles','IngresoController@obtenerDetalles');
 
         Route::get('/client','ClienteController@index');
         Route::post('/client/register','ClienteController@store');
