@@ -92,6 +92,17 @@ class ArticleController extends Controller
 
     }
 
+    public function listarPdf(){
+        $articles = Article::join('categories','articles.idcategory','=','categories.id')
+        ->select('articles.id','articles.idcategory','articles.code','articles.name',
+        'categories.name as name_category', 'articles.price_vent','articles.stock',
+        'articles.description','articles.condition')
+        ->orderBy('articles.name', 'desc')->get();
+
+        $cont=Article::count();
+        $pdf = \PDF::loadView('pdf.articulospdf',['articles'=>$articles,'cont'=>$cont]);
+        return $pdf->download('articulos.pdf');
+    }
 
 
     public function buscarArticulo(Request $request){

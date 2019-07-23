@@ -73,7 +73,28 @@ class VentaController extends Controller
          
         return ['detalles' => $detalles];
     }
- 
+    public function pdf(Request $request,$id){
+        $venta = Venta::join('personas','ventas.idcliente','=','personas.id')
+            ->join('users','ventas.idusuario','=','users.id')
+            ->select('ventas.id','ventas.tipo_comprobante','ventas.serie_comprobante',
+            'ventas.num_comprobante','ventas.created_at','ventas.impuesto','ventas.total',
+            'ventas.estado','personas.name','personas.type_document','personas.num_document',
+            'personas.address','personas.email',
+            'personas.phone','users.user')
+            ->where('ventas.id','=',$id)
+            ->orderBy('ventas.id', 'desc')->take(1)->get();
+        
+        $detalles = DetalleVenta::join('articles','detalle_ventas.idarticulo','=','articles.id')
+        ->select('detalle_ventas.cantidad','detalle_ventas.precio','detalle_ventas.descuento',
+        'articles.name as article')
+        ->where('detalle_ventas.idventa','=',$id)
+        ->orderBy('detalle_ventas.id','desc')->get();
+        
+        $numventa=Venta::select('num_comprobante')->where('id',$id)->get();
+
+        $pdf = \PDF::loadView('pdf.venta',['venta'=>$venta,'detalles'=>$detalles]);
+        return $pdf->download('venta-'.$numventa[0]->num_comprobante.'.pdf');
+    }
     public function store(Request $request)
     {
         if (!$request->ajax()) return redirect('/');
@@ -110,6 +131,9 @@ class VentaController extends Controller
             }          
  
             DB::commit();
+            return[
+                'id'=>$venta->id
+            ];
         } catch (Exception $e){
             DB::rollBack();
         }

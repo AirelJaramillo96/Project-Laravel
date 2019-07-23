@@ -13,6 +13,9 @@
                         <button type="button" @click="openModal('article','register')" class="btn btn-secondary" >
                             <i class="icon-plus"></i>&nbsp;Nuevo
                         </button>
+                        <button type="button" @click="cargarPdf()" class="btn btn-info" >
+                            <i class="icon-doc"></i>&nbsp;Reporte
+                        </button>
                     </div>
                     <div class="card-body">
                         <div class="form-group row">
@@ -259,6 +262,9 @@
                 // handle error
                  console.log(error);
                 });
+            },
+            cargarPdf(){
+                window.open('http://localhost:8000/article/listarPdf','_blank');
             },
             selectCategory(){
                 let me=this;

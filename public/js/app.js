@@ -40110,6 +40110,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -40188,6 +40191,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 // handle error
                 console.log(error);
             });
+        },
+        cargarPdf: function cargarPdf() {
+            window.open('http://localhost:8000/article/listarPdf', '_blank');
         },
         selectCategory: function selectCategory() {
             var me = this;
@@ -43054,6 +43060,23 @@ var render = function() {
             [
               _c("i", { staticClass: "icon-plus" }),
               _vm._v(" Nuevo\n                        ")
+            ]
+          ),
+          _vm._v(" "),
+          _c(
+            "button",
+            {
+              staticClass: "btn btn-info",
+              attrs: { type: "button" },
+              on: {
+                click: function($event) {
+                  return _vm.cargarPdf()
+                }
+              }
+            },
+            [
+              _c("i", { staticClass: "icon-doc" }),
+              _vm._v(" Reporte\n                        ")
             ]
           )
         ]),
@@ -51294,6 +51317,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -51430,6 +51456,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 console.log(error);
             });
         },
+        pdfVenta: function pdfVenta(id) {
+            window.open('http://localhost:8000/venta/pdf/' + id + ',' + '_blank');
+        },
         changePage: function changePage(page, buscar, criterion) {
             var me = this;
             //Actualizar pagina actual
@@ -51553,6 +51582,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 me.code = '';
                 me.descuento = 0;
                 me.arrayDetalle = [];
+                window.open('http://localhost:8000/venta/pdf/' + response.data.id + ',' + '_blank');
             }).catch(function (error) {
                 console.log(error);
             });
@@ -51883,6 +51913,22 @@ var render = function() {
                                       }
                                     },
                                     [_c("i", { staticClass: "icon-eye" })]
+                                  ),
+                                  _vm._v(
+                                    "  \n                                            "
+                                  ),
+                                  _c(
+                                    "button",
+                                    {
+                                      staticClass: "btn btn-info btn-sm",
+                                      attrs: { type: "button" },
+                                      on: {
+                                        click: function($event) {
+                                          return _vm.pdfVenta(venta.id)
+                                        }
+                                      }
+                                    },
+                                    [_c("i", { staticClass: "icon-doc" })]
                                   ),
                                   _vm._v(
                                     "  \n                                            "
